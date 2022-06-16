@@ -161,7 +161,6 @@ if __name__ == "__main__":
         ax.set_xlabel("Seperation Values (mas)")
         ax.set_ylabel("\u0394 Kp Magnitudes")
         plt.grid()
-        plt.step()
         plt.close()
     finally:
         ax.invert_yaxis()
