@@ -14,6 +14,7 @@ import astropy.io.ascii as at
 import matplotlib.pyplot as plt
 import pandas as pd
 
+
 def get_data_masking(starname): # Get kp mags for a given star (masking dataset)
     
     # Get file
@@ -99,9 +100,9 @@ def get_data_psf(starname): # Get kp mag vs. sep vals for a given star (psf data
         return kp_mags_psf
 
 def plot_star(starname, ax=None): # Plot psf and masking curves for a given star
-
-    if ax is None:
-        fig, ax = plt.subplots() # Create the plot for the input star
+    if ax is None: 
+        # Create the plot for the input star
+        fig, ax = plt.subplots()
         plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
         ax.set_xlabel("Seperation Values (mas)")
         ax.set_ylabel("\u0394 Kp Magnitudes")  #\u0394 is a Delta symbol
@@ -112,27 +113,23 @@ def plot_star(starname, ax=None): # Plot psf and masking curves for a given star
     kp_mags_psf = get_data_psf(f"{starname}")     
     
     if np.all(kp_mags_psf == None): # If no psf data has been found, do not create a plot
-        plt.close()
         print(f"No PSF plot has been generated for {starname}.")
         return None
     else:
-        ax.plot(sep_vals_psf, kp_mags_psf, color = 'blue', marker = 'o', label = f"{starname} (PSF)")
-    
+        # ax.plot(sep_vals_psf, kp_mags_psf, color = 'blue', marker = 'o')#, label = "PSF")
+        plt.step(x=sep_vals_psf, y=kp_mags_psf, marker = 'o')
+
     # Plot masking data
     sep_vals_masking = np.array([15, 30, 60, 120, 200, 280])
     kp_mags_masking = get_data_masking(starname)
     
     if np.all(kp_mags_masking == None): # If no masking data has been found, do not create a plot
-        plt.close()    
         print(f"No masking plot has been generated for {starname}.")
         return None
     else:
-        # Plot settings
-        ax.plot(sep_vals_masking, kp_mags_masking, marker = 'o', color='red', label = f"{starname} (Masking)")
-        ax.invert_yaxis()
-        # plt.legend()
-        plt.grid()
-        # plt.show()
+        # ax.plot(sep_vals_masking, kp_mags_masking, marker = 'o', color='red')#, label = "Masking")
+        plt.step(x=sep_vals_masking, y=kp_mags_masking, marker = 'o')
+
 
 if __name__ == "__main__":
     # masking = get_data_masking("HSHJ300")
@@ -151,11 +148,26 @@ if __name__ == "__main__":
     # List of star names
 
     targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
-    for name, obsdate in targets.iterrows():
-        if not pd.isnull(obsdate[0]):
-            star = name.replace(" ", "_")
-            print(star)
-            plot_star(star)
-            plt.show()
-
-        
+    try:
+        fig, ax = plt.subplots()
+        for name, obsdate in targets.iterrows():
+            if not pd.isnull(obsdate[0]):
+                star = name.replace(" ", "_")
+                print(star)
+                plot_star(star, ax)
+    except KeyboardInterrupt:
+        ax.invert_yaxis()
+        plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
+        ax.set_xlabel("Seperation Values (mas)")
+        ax.set_ylabel("\u0394 Kp Magnitudes")
+        plt.grid()
+        plt.step()
+        plt.close()
+    finally:
+        ax.invert_yaxis()
+        plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
+        ax.set_xlabel("Seperation Values (mas)")
+        ax.set_ylabel("\u0394 Kp Magnitudes")
+        plt.grid()
+        plt.show()
+        plt.close()
