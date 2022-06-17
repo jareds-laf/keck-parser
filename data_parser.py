@@ -22,13 +22,13 @@ def get_data_masking(starname): # Get kp mags for a given star (masking dataset)
 
     filelist = glob.glob(os.path.join(keck_masking_dir, f"{starname}*"))
     
-    if len(filelist) == 1: # Proper operation
+    if len(filelist) == 1: # Proper operation! Only one entry found in masking data :)
         filename = filelist[0]
     elif len(filelist) == 0: # If no star with the input name is found
-        # print(f"Easton, we have a problem! No such star {starname} detected.")
+        print(f"No masking data detected for {starname}.")
         return None
     elif len(filelist) > 1: # If there is more than one star with the input name
-        print(f"Easton, we have a problem! Multiple masking entries detected for {starname}")
+        print(f"Easton, we have a problem! Multiple masking entries detected for {starname} :(")
         print(filelist)
         return None
 
@@ -51,7 +51,7 @@ def get_data_masking(starname): # Get kp mags for a given star (masking dataset)
     # Turn the data into an array
     try:
         raw_data = lc.getline(filename, length-1)
-        data_as_string = raw_data[raw_data.find(r'&')+1:raw_data.find(r'\\')] # Skips the "99% only" and runs until the "\\" at the end of the line
+        data_as_string = raw_data[raw_data.find(r'&')+1 : raw_data.find(r'\\')] # Skips the "99% only" and runs until the "\\" at the end of the line
         data_as_arr = data_as_string.split('&')
         data = np.asarray(data_as_arr, dtype="float")
     except ValueError:
@@ -69,13 +69,14 @@ def get_data_masking(starname): # Get kp mags for a given star (masking dataset)
 def get_data_psf(starname): # Get kp mag vs. sep vals for a given star (psf dataste)
 
     # Correcting the name so each star can be properly located
-    starname_psf = starname
+    starname_psf = f"{starname}" # Names separated due to different name formats between datasets
+
     if "_" in f"{starname_psf}":
         starname_psf = starname.replace("_", " ")
-    elif starname_psf[0:4] == "EPIC" and starname_psf[0:5] != "EPIC ":
+    elif (starname_psf[0:4] == "EPIC" and starname_psf[0:5] != "EPIC "):
         starname_psf = re.sub("EPIC", "EPIC ", starname_psf)
 
-    # print("Names:", starname, "(masking), and", starname_psf, "(psf)\n")
+    # print(f"Names: {starname} (masking), and {starname_psf} (psf)\n")
 
     names_col = ["Name", "Epoch", "Filter", "N_obs", "t_int", "150", "200", "250", "300", "400", "500", "700", "1000", "1500", "2000", "PI"] # Column names for psf data
 
@@ -135,6 +136,7 @@ def get_data_psf(starname): # Get kp mag vs. sep vals for a given star (psf data
                 if maximum[0] < current[0]:
                     maximum = np.asarray(our_praesepe_data_new[:, row_index_list[0][entry]].astype(float))
             print("Entry with highest mag:", maximum[1:])
+            return maximum
 
     else: # Only one entry for the input name (proper functionality)! :)
         kp_mags_psf = np.asarray(our_praesepe_data_new[:, row_index_list[0]].astype(float))
@@ -146,95 +148,176 @@ def plot_star(starname, ax=None): # Plot psf and masking curves for a given star
     if ax is None: 
         # Create the plot for the input star
         fig, ax = plt.subplots()
-        plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
+        plt.title(f"\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
         ax.set_xlabel("Seperation Values (mas)")
         ax.set_ylabel("\u0394 Kp Magnitudes")  #\u0394 is a Delta symbol
 
-    
+
     # Plot data
     sep_vals_psf = np.array([150, 200, 250, 300, 400, 500, 700, 1000, 1500, 2000])
     sep_vals_masking = np.array([15, 30, 60, 120, 200, 280])
-    
-    kp_mags_masking = get_data_masking(starname)[1:]
-   
-    starname_psf = f"{starname}"
-    
-    if "_" in f"{starname_psf}":
-        starname_psf = starname_psf.replace("_", " ")
-    elif starname[0:4] == "EPIC" and starname[0:5] != "EPIC ":
-        starname_psf = re.sub("EPIC", "EPIC ", starname_psf)
-    kp_mags_psf = get_data_psf(f"{starname_psf}")
 
-    
+    # Join separation values
     sep_vals_all = np.concatenate((sep_vals_masking[0 : np.size(sep_vals_masking) - 2], sep_vals_psf))
     
-    
-    if np.all(kp_mags_psf == None): # If no psf data has been found, do not create a plot
-        print(f"No PSF data found; no plot has been generated for {starname}.")
+    # Make sure there is data from both sources
+    if np.all(get_data_psf(f"{starname}") == None): # If no psf data has been found, do not create a plot
+        print(f"No PSF data found; no plot has been generated for {starname}.\n")
         return None
-    elif np.all(kp_mags_masking == None): # If no masking data has been found, do not create a plot
-        print(f"No masking data found; no plot has been generated for {starname}.")
+    elif np.all(get_data_masking(f"{starname}") == None): # If no masking data has been found, do not create a plot
+        print(f"No masking data found; no plot has been generated for {starname}.\n")
         return None
     else:
         # Join masking data (except last 2 points) and psf data into one array and plot
         # Doing so since psf data is better at the overlapping points
+        kp_mags_psf = get_data_psf(starname)[1:]
+        kp_mags_masking = get_data_masking(starname)[1:]
+
+        
         kp_mags_all = np.concatenate((kp_mags_masking[0 : np.size(kp_mags_masking) - 2], kp_mags_psf))
-        plt.step(x=sep_vals_all, y=kp_mags_all, color = "#9cffb6", alpha = 0.75,)
         plt.step(x=sep_vals_all, y=kp_mags_all, color = "#9cffb6", alpha = 0.75)
 
 if __name__ == "__main__":
+    # JS355 is the "control" -- it tends to work without problems
+    # AD_0738 is experimental -- it's name changes between data sets due to the difference in formatting between them
+    # EPIC211998192 is experimental -- it's name format also changes between data sets
+    # HSHJ300 is experimental -- it has a masking file but has no masking data; it has no PSF data
+    
+    
     # masking = get_data_masking("JS355")
     # masking = get_data_masking("AD_0738")
     # masking = get_data_masking("EPIC211998192")
+    # masking = get_data_masking("HSHJ300")
 
-    # print(masking[1:])
+
+    # print(masking)
 
     # print()
 
-    # psf = get_data_psf("EPIC211885995")
-    # psf = get_data_psf("EPIC211998192")
+
     # psf = get_data_psf("JS355")
     # psf = get_data_psf("AD_0738")
+    # psf = get_data_psf("EPIC211998192")
+    # psf = get_data_psf("HSHJ300")
     # print(psf)
 
     # print()
 
-    # plot_star("HSHJ300")
     # plot_star("JS355")
+    # plot_star("AD_0738")
     # plot_star("EPIC211998192")
-    plot_star("AD_0738")
+    # plot_star("HSHJ300")
 
-    # List of star names
+    # Plot all targets:
+    targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
+    try:
+        fig, ax = plt.subplots()
+        for name, obsdate in targets.iterrows():
+            if not pd.isnull(obsdate[0]):
+                star = name.replace(" ", "_")
+                print(star)
+                plot_star(star, ax)
+    except KeyboardInterrupt:
+        plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
+        ax.set_xlabel("Seperation Values (mas)")
+        ax.set_ylabel("\u0394 Kp Magnitudes")
+        if ax.get_ylim()[0] < ax.get_ylim()[1]:
+            ax.invert_yaxis()
+        plt.grid(visible = True)
+        plt.show()
+        plt.close("all")
+    else:
+        plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
+        ax.set_xlabel("Seperation Values (mas)")
+        ax.set_ylabel("\u0394 Kp Magnitudes")
+        if ax.get_ylim()[0] < ax.get_ylim()[1]:
+            ax.invert_yaxis()
+        plt.grid(visible = True)
+        plt.show()
+        plt.close("all")
 
-    # targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
-    # try:
-    #     fig, ax = plt.subplots()
-    #     for name, obsdate in targets.iterrows():
-    #         if not pd.isnull(obsdate[0]):
-    #             star = name.replace(" ", "_")
-    #             print(star)
-    #             plot_star(star, ax)
-    # except KeyboardInterrupt:
-    #     plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
-    #     ax.set_xlabel("Seperation Values (mas)")
-    #     ax.set_ylabel("\u0394 Kp Magnitudes")
-    #     if ax.get_ylim()[0] < ax.get_ylim()[1]:
-    #         ax.invert_yaxis()
-    #     plt.grid(visible = True)
-    #     plt.show()
-    #     plt.close("all")
-    # else:
-    #     plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
-    #     ax.set_xlabel("Seperation Values (mas)")
-    #     ax.set_ylabel("\u0394 Kp Magnitudes")
-    #     if ax.get_ylim()[0] < ax.get_ylim()[1]:
-    #         ax.invert_yaxis()
-    #     plt.grid(visible = True)
-    #     plt.show()
-    #     plt.close("all")
+# List of targets confirmed to be MISSING from the PSF data:
+    # JS256
+    # KW573
+    # JS105
+    # JS188
+    # JC105
+    # JS706
+    # JS344
+    # AD 2902
+    # EPIC 212011731
+    # AD 3349
+    # AD 1215
+    # HSHJ197
+    # JS391
+    # JS416
+    # JS434
+    # JS490
+    # JS 27
+    # JS284
+    # JS475
+    # JS 22
+    # JS126
+    # JS163
+    # JS506
+    # AD 1695
+    # AD 2759
+    # AD 1423
+    # JS384
+    # JS489
+    # AD 1026
+    # JS206
+    # AD 2371
+    # JS411
+    # JS427
+    # JS457
+    # JS542
+    # JS 19
+    # JS110
+    # EPIC 212011557
+    # HSHJ393
+    # JS564
+    # JS609
+    # JS281
+    # JS534
+    # JS557
+    # JS613
+    # JS649
+    # AD 3962
+    # JS240
+    # AD 1240
+    # JS597
+    # AD 1508
+    # JS159
+    # HSHJ 15
+    # KW570
+    # KW566
+    # JS497
+    # JS 45
+    # JS 97
+    # JS586
+    # HSHJ  7
+    # JS107
+    # JS118
+    # JS140
+    # JS180
+    # JS244
+    # JS353
+    # JS595
+    # AD 4129
+    # AD 4242
+    # JS 35
+    # JS112
+    # AD 2250
+    # JS227
+    # JS340
+    # JS462
+    # JS548
+    
+# Targets INCLUDED in PSF data but from different PI:
+    # JS260
+    
 
-
-    # Check why so many PSF plots aren't being generated!
-    # Make sure plot_star is working after letting get_data return date as well
+    # Continue checking why so many PSF plots aren't being generated!
     # Export the data to a file that MOLUSC can take
         # Create a separate file for each star. Put them in a separate folder with a good naming convention!
