@@ -15,22 +15,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import re
 
-# def get_date(starname): # Get the date for
-#     # Get file
-#     keck_masking_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/data/keck_masking_detections_praesepe/*')
-    
-#     filelist = glob.glob(os.path.join(keck_masking_dir, f"{starname}*"))
-    
-#     if len(filelist) == 1: # Proper operation
-#         filename = filelist[0]
-#     elif len(filelist) == 0: # If no star with the input name is found
-#         # print(f"Easton, we have a problem! No such star {starname} detected.")
-#         return None
-#     elif len(filelist) > 1: # If there is more than one star with the input name
-#         print(f"Easton, we have a problem! Multiple masking entries detected for {starname}")
-#         print(filelist)
-#         return None
-
 def get_data_masking(starname): # Get kp mags for a given star (masking dataset)
     
     # Get file
@@ -83,7 +67,7 @@ def get_data_masking(starname): # Get kp mags for a given star (masking dataset)
     return data
 
 def get_data_psf(starname): # Get kp mag vs. sep vals for a given star (psf dataste)
-    
+
     # Correcting the name so each star can be properly located
     starname_psf = starname
     if "_" in f"{starname_psf}":
@@ -91,8 +75,10 @@ def get_data_psf(starname): # Get kp mag vs. sep vals for a given star (psf data
     elif starname_psf[0:4] == "EPIC" and starname_psf[0:5] != "EPIC ":
         starname_psf = re.sub("EPIC", "EPIC ", starname_psf)
 
+    # print("Names:", starname, "(masking), and", starname_psf, "(psf)\n")
+
     names_col = ["Name", "Epoch", "Filter", "N_obs", "t_int", "150", "200", "250", "300", "400", "500", "700", "1000", "1500", "2000", "PI"] # Column names for psf data
-    
+
     # Get data path
     keck_psf_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/data/keck_psf_detections_praesepe/')
     praesepe_data = at.read(os.path.join(keck_psf_dir, 'detlimtable_praesepe.txt'), data_start=0, delimiter="&", names = names_col, fill_values=[("...", np.nan)])
@@ -100,38 +86,61 @@ def get_data_psf(starname): # Get kp mag vs. sep vals for a given star (psf data
     praesepe_new = (praesepe_data["PI"] == "Douglas") & (praesepe_data["Filter"] == "Kp") # Kp is a filter in near infrared
     our_praesepe_data = praesepe_data[praesepe_new]
     
-    # Making numpy array of the delta mag values
+    # Making numpy array of the date (index = 0) and mag values (indeces 1 --> 10)
     our_praesepe_data_new = np.array([our_praesepe_data["Epoch"], our_praesepe_data["150"], our_praesepe_data["200"], our_praesepe_data["250"], our_praesepe_data["300"], our_praesepe_data["400"], our_praesepe_data["500"], our_praesepe_data["700"], our_praesepe_data["1000"], our_praesepe_data["1500"], our_praesepe_data["2000"]])
     
     row_index_list = np.where(our_praesepe_data["Name"]==starname_psf)
     
+    # print("Row index list: ", row_index_list[0])
+    # print("PSF date:",our_praesepe_data_new[0][5])
+    
     if np.size(row_index_list) == 0: # No entry with the input name
         print(f"No PSF data was found for star {starname_psf}.")
         return None
+    
     elif np.size(row_index_list) > 1: # More than one entry with the input name
-        if np.all(get_data_masking(starname) != None): # Check if it has masking data
+    
+        if np.all(get_data_masking(starname) != None): # Check if the input star has masking data
             data_masking = get_data_masking(starname)
-            for entry in range(np.size(row_index_list[0])):
-                if data_masking[0] == row_index_list[0][entry]: # Check which entry date matches the masking data date
-                    print(row_index_list[0][entry])
-        else:
-            print(f"Easton, we have a problem! Multiple PSF entries detected for {starname} :(")
-            print(row_index_list[0])
-            i=0
-            for entry in range(np.size(row_index_list[0])):
+            # print("Masking data:", data_masking)
+            # print("Masking data date:", data_masking[0])
+            # print("PSF data dates:", our_praesepe_data_new[0][row_index_list[0]])
+            for entry in range(np.size(row_index_list[0])): # Loop through all entries of the star that has duplicates
+                current_entry = our_praesepe_data_new[0][row_index_list[0][entry]] # Date for the current entry being tested
+                # print(f"Entry #{entry}:")
+                # print("Potential match date:", our_praesepe_data_new[0][row_index_list[0][entry]])
+                if abs(data_masking[0] - current_entry) < 0.5: # Check which entry date matches the masking data date. Detects if the dates were taken the same night
+                    # print(f"Match found! Entry #{entry}")    
+                    # print("Matching date:", current_entry, "\n")
+                    kp_mags_psf = np.asarray(our_praesepe_data_new[:, row_index_list[0][entry]].astype(float))
+                    kp_mags_psf = np.reshape(kp_mags_psf, len(kp_mags_psf))
+                    # print(kp_mags_psf)
+                    return kp_mags_psf
+                    # break
+                else: # Current entry doesn't match, continue with loop
+                    # print(f"Entry #{entry} was not observed on the same night as {starname}\n")
+                    continue
+
+        else: # No masking data!
+            print(f"Easton, we have a problem! Multiple PSF entries detected and no masking data found for {starname} :(")
+            print("Row indeces detected:", row_index_list[0])
+            i=0 # i is used to differentiate the different entries
+            
+            # Finding which entry has a higher magnitude contrast (since we could see fainter companions in these cases)
+            for entry in range(np.size(row_index_list[0])): # Loop through all entries of the star that has duplicates
                 i+=1
-                print(i, np.asarray(our_praesepe_data_new[:, row_index_list[0][entry]].astype(float)))        
-                maximum = np.asarray(our_praesepe_data_new[:, row_index_list[0][0]].astype(float))
+                print(i, np.asarray(our_praesepe_data_new[:, row_index_list[0][entry]][1:].astype(float)))
+                maximum = np.asarray(our_praesepe_data_new[:, row_index_list[0][entry]].astype(float))
                 current = np.asarray(our_praesepe_data_new[:, row_index_list[0][entry]].astype(float))
                 if maximum[0] < current[0]:
                     maximum = np.asarray(our_praesepe_data_new[:, row_index_list[0][entry]].astype(float))
-            print("Highest mag:", maximum)
+            print("Entry with highest mag:", maximum[1:])
 
-    else:
+    else: # Only one entry for the input name (proper functionality)! :)
         kp_mags_psf = np.asarray(our_praesepe_data_new[:, row_index_list[0]].astype(float))
         kp_mags_psf = np.reshape(kp_mags_psf, len(kp_mags_psf))
-        print("All seems good!")
-        return kp_mags_psf[1:]
+        # print("All seems good!")
+        return kp_mags_psf
 
 def plot_star(starname, ax=None): # Plot psf and masking curves for a given star
     if ax is None: 
@@ -174,24 +183,26 @@ def plot_star(starname, ax=None): # Plot psf and masking curves for a given star
         plt.step(x=sep_vals_all, y=kp_mags_all, color = "#9cffb6", alpha = 0.75)
 
 if __name__ == "__main__":
-    masking = get_data_masking("JS355")
-    masking = get_data_masking("AD_0738")
-    print(masking[1:])
+    # masking = get_data_masking("JS355")
+    # masking = get_data_masking("AD_0738")
+    # masking = get_data_masking("EPIC211998192")
+
+    # print(masking[1:])
 
     # print()
 
     # psf = get_data_psf("EPIC211885995")
     # psf = get_data_psf("EPIC211998192")
     # psf = get_data_psf("JS355")
-    psf = get_data_psf("AD_0738")
-    print(psf)
+    # psf = get_data_psf("AD_0738")
+    # print(psf)
 
     # print()
 
     # plot_star("HSHJ300")
     # plot_star("JS355")
     # plot_star("EPIC211998192")
-    # plot_star("AD_0738")
+    plot_star("AD_0738")
 
     # List of star names
 
