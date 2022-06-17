@@ -129,6 +129,10 @@ def plot_star(starname, ax=None): # Plot psf and masking curves for a given star
     else:
         # ax.plot(sep_vals_masking, kp_mags_masking, marker = 'o', color='red')#, label = "Masking")
         plt.step(x=sep_vals_masking, y=kp_mags_masking, marker = 'o')
+        ax.invert_yaxis()
+        ax.grid()
+
+
 
 
 if __name__ == "__main__":
@@ -156,17 +160,18 @@ if __name__ == "__main__":
                 print(star)
                 plot_star(star, ax)
     except KeyboardInterrupt:
-        ax.invert_yaxis()
         plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
         ax.set_xlabel("Seperation Values (mas)")
         ax.set_ylabel("\u0394 Kp Magnitudes")
+        ax.invert_yaxis()
         plt.grid()
+        plt.show()
         plt.close()
-    finally:
-        ax.invert_yaxis()
+    else:
         plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
         ax.set_xlabel("Seperation Values (mas)")
         ax.set_ylabel("\u0394 Kp Magnitudes")
+        ax.invert_yaxis()
         plt.grid()
         plt.show()
         plt.close()
