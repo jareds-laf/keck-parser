@@ -117,7 +117,7 @@ def plot_star(starname, ax=None): # Plot psf and masking curves for a given star
         return None
     else:
         # ax.plot(sep_vals_psf, kp_mags_psf, color = 'blue', marker = 'o')#, label = "PSF")
-        plt.step(x=sep_vals_psf, y=kp_mags_psf, marker = 'o')
+        plt.step(x=sep_vals_psf, y=kp_mags_psf, alpha = 0.75, color = "black")
 
     # Plot masking data
     sep_vals_masking = np.array([15, 30, 60, 120, 200, 280])
@@ -128,7 +128,7 @@ def plot_star(starname, ax=None): # Plot psf and masking curves for a given star
         return None
     else:
         # ax.plot(sep_vals_masking, kp_mags_masking, marker = 'o', color='red')#, label = "Masking")
-        plt.step(x=sep_vals_masking, y=kp_mags_masking, marker = 'o')
+        plt.step(x=sep_vals_masking, y=kp_mags_masking, alpha = 0.75, color = "black")
         ax.invert_yaxis()
         ax.grid()
 
@@ -163,15 +163,22 @@ if __name__ == "__main__":
         plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
         ax.set_xlabel("Seperation Values (mas)")
         ax.set_ylabel("\u0394 Kp Magnitudes")
-        ax.invert_yaxis()
-        plt.grid()
+        if ax.get_ylim()[0] < ax.get_ylim()[1]:
+            ax.invert_yaxis()
+        plt.grid(visible = True)
         plt.show()
-        plt.close()
+        plt.close("all")
     else:
         plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
         ax.set_xlabel("Seperation Values (mas)")
         ax.set_ylabel("\u0394 Kp Magnitudes")
-        ax.invert_yaxis()
-        plt.grid()
+        if ax.get_ylim()[0] < ax.get_ylim()[1]:
+            ax.invert_yaxis()
+        plt.grid(visible = True)
         plt.show()
-        plt.close()
+        plt.close("all")
+
+
+    # Delete a few points (last 2) from masking and then join the psf and masking arrays to create a single curve
+    # Export the data to a file that MOLUSC can take
+        # Create a separate file for each star. Put them in a separate folder with a good naming convention!
