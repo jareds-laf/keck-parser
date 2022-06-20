@@ -327,6 +327,7 @@ if __name__ == "__main__":
     list_exp_psf = []
     
     targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
+<<<<<<< HEAD
     for name, obsdate in targets.iterrows():
         print("Name:", name, "Obsdate:", obsdate[14])
         if not pd.isnull(obsdate[14]):
@@ -359,3 +360,36 @@ if __name__ == "__main__":
 
 # To do next:
 # Output data with J filter as well
+=======
+    try:
+        fig, ax = plt.subplots()
+        for name, obsdate in targets.iterrows():
+            print("Name:", name, "Obsdate:", obsdate[14])
+            if not pd.isnull(obsdate[14]):
+                star = name.replace(" ", "_")
+                # print(star)
+                plot_star(star, ax)
+            else:
+                print(f"Plot not generated for {name}")
+    except KeyboardInterrupt:
+        plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
+        ax.set_xlabel("Seperation Values (mas)")
+        ax.set_ylabel("\u0394 Kp Magnitudes")
+        if ax.get_ylim()[0] < ax.get_ylim()[1]:
+            ax.invert_yaxis()
+        plt.grid(visible = True)
+        plt.show()
+        plt.close("all")
+    else:
+        plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
+        ax.set_xlabel("Seperation Values (mas)")
+        ax.set_ylabel("\u0394 Kp Magnitudes")
+        if ax.get_ylim()[0] < ax.get_ylim()[1]:
+            ax.invert_yaxis()
+        plt.grid(visible = True)
+        plt.show()
+        plt.close("all")
+
+    # Export the data to a file that MOLUSC can take
+        # Create a separate file for each star. Put them in a separate folder with a good naming convention!
+>>>>>>> defb24dfed48d5e18f66d7d99c1251d6c9291568
