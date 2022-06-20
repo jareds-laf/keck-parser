@@ -213,10 +213,13 @@ if __name__ == "__main__":
     try:
         fig, ax = plt.subplots()
         for name, obsdate in targets.iterrows():
-            if not pd.isnull(obsdate[0]):
+            print("Name:", name, "Obsdate:", obsdate[14])
+            if not pd.isnull(obsdate[14]):
                 star = name.replace(" ", "_")
-                print(star)
+                # print(star)
                 plot_star(star, ax)
+            else:
+                print(f"Plot not generated for {name}")
     except KeyboardInterrupt:
         plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
         ax.set_xlabel("Seperation Values (mas)")
@@ -236,88 +239,5 @@ if __name__ == "__main__":
         plt.show()
         plt.close("all")
 
-# List of targets confirmed to be MISSING from the PSF data:
-    # JS256
-    # KW573
-    # JS105
-    # JS188
-    # JC105
-    # JS706
-    # JS344
-    # AD 2902
-    # EPIC 212011731
-    # AD 3349
-    # AD 1215
-    # HSHJ197
-    # JS391
-    # JS416
-    # JS434
-    # JS490
-    # JS 27
-    # JS284
-    # JS475
-    # JS 22
-    # JS126
-    # JS163
-    # JS506
-    # AD 1695
-    # AD 2759
-    # AD 1423
-    # JS384
-    # JS489
-    # AD 1026
-    # JS206
-    # AD 2371
-    # JS411
-    # JS427
-    # JS457
-    # JS542
-    # JS 19
-    # JS110
-    # EPIC 212011557
-    # HSHJ393
-    # JS564
-    # JS609
-    # JS281
-    # JS534
-    # JS557
-    # JS613
-    # JS649
-    # AD 3962
-    # JS240
-    # AD 1240
-    # JS597
-    # AD 1508
-    # JS159
-    # HSHJ 15
-    # KW570
-    # KW566
-    # JS497
-    # JS 45
-    # JS 97
-    # JS586
-    # HSHJ  7
-    # JS107
-    # JS118
-    # JS140
-    # JS180
-    # JS244
-    # JS353
-    # JS595
-    # AD 4129
-    # AD 4242
-    # JS 35
-    # JS112
-    # AD 2250
-    # JS227
-    # JS340
-    # JS462
-    # JS548
-    
-# Targets INCLUDED in PSF data but from different PI:
-    # JS260
-    
-
-    # Continue checking why so many PSF plots aren't being generated!
     # Export the data to a file that MOLUSC can take
         # Create a separate file for each star. Put them in a separate folder with a good naming convention!
