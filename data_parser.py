@@ -101,7 +101,7 @@ def get_data_psf(starname): # Get kp mag vs. sep vals for a given star (psf data
     
     elif np.size(row_index_list) > 1: # More than one entry with the input name
     
-        if np.all(get_data_masking(starname) != None): # Check if the input star has masking data
+        if get_data_masking(starname) is not None: # Check if the input star has masking data
             data_masking = get_data_masking(starname)
             # print("Masking data:", data_masking)
             # print("Masking data date:", data_masking[0])
@@ -161,10 +161,10 @@ def plot_star(starname, ax=None): # Plot psf and masking curves for a given star
     sep_vals_all = np.concatenate((sep_vals_masking[0 : np.size(sep_vals_masking) - 2], sep_vals_psf))
     
     # Make sure there is data from both sources
-    if np.all(get_data_psf(f"{starname}") == None): # If no psf data has been found, do not create a plot
+    if get_data_psf(f"{starname}") is None: # If no psf data has been found, do not create a plot
         print(f"No PSF data found; no plot has been generated for {starname}.\n")
         return None
-    elif np.all(get_data_masking(f"{starname}") == None): # If no masking data has been found, do not create a plot
+    elif get_data_masking(f"{starname}") is None: # If no masking data has been found, do not create a plot
         print(f"No masking data found; no plot has been generated for {starname}.\n")
         return None
     else:
@@ -175,29 +175,103 @@ def plot_star(starname, ax=None): # Plot psf and masking curves for a given star
 
         
         kp_mags_all = np.concatenate((kp_mags_masking[0 : np.size(kp_mags_masking) - 2], kp_mags_psf))
-        plt.step(x=sep_vals_all, y=kp_mags_all, color = "#9cffb6", alpha = 0.75)
+        plt.step(x=sep_vals_all, y=kp_mags_all, color = "blue", alpha = 0.75)
+
+def export_star(starname): # Export the data to a file that MOLUSC can take. Lots of overlap with the plot_star function
+
+    # Get separation values
+    sep_vals_psf = np.array([150, 200, 250, 300, 400, 500, 700, 1000, 1500, 2000])
+    sep_vals_masking = np.array([15, 30, 60, 120, 200, 280])
+    sep_vals_all = np.concatenate((sep_vals_masking[0 : np.size(sep_vals_masking) - 2], sep_vals_psf))
+    
+    # Make sure there is data from both sources
+    if (get_data_psf(f"{starname}") is None) and (get_data_masking(f"{starname}") is None): # If no data has been found, do not try to export
+        print(f"No data found; no file has been generated for {starname}.\n")
+        return None
+    elif (get_data_psf(f"{starname}") is not None) and (get_data_masking(f"{starname}") is not None): # Have both sets of data
+        # Join masking data (except last 2 points) and psf data into one array and plot
+        # Doing so since psf data is better at the overlapping points
+        kp_mags_psf = get_data_psf(starname)[1:]
+        kp_mags_masking = get_data_masking(starname)[1:]
+        kp_mags_all = np.concatenate((kp_mags_masking[0 : np.size(kp_mags_masking) - 2], kp_mags_psf))
+        
+        # Create a table from the data
+        data = Table(data = [sep_vals_all, kp_mags_all], names = ["Sep", "Contrast"])
+        
+        # Export the data to a file, so long as there is not already a file for the star
+        export_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/MOLUSC Inputs/Data Parser Tables')
+
+        filelist = glob.glob(os.path.join(export_dir, f"{starname}.txt"))
+        
+        if len(filelist) >= 1: # File found!
+            print(f"Error: file detected for {starname}\n")
+            return None
+        elif len(filelist) == 0: # No file has been previously generated
+            data.write(os.path.join(export_dir, f"{starname}.txt"), format = 'ascii.basic', delimiter = ' ', overwrite=True)
+            print(f"File generated for {starname}!\n")
+            # return data
+            
+    elif (get_data_psf(f"{starname}") is None) and (get_data_masking(f"{starname}") is not None): # Only masking
+        kp_mags_masking = get_data_masking(starname)[1:]
+        data = Table(data = [sep_vals_masking, kp_mags_masking], names = ["Sep", "Contrast"])
+        
+        export_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/MOLUSC Inputs/Data Parser Tables')
+        
+        filelist = glob.glob(os.path.join(export_dir, f"{starname}.txt"))
+
+        if len(filelist) >= 1: # File found!
+            print(f"Error: file detected for {starname}\n")
+            return None
+        elif len(filelist) == 0: # No file has been previously generated
+            data.write(os.path.join(export_dir, f"{starname}.txt"), format = 'ascii.basic', delimiter = ' ', overwrite=True)
+            print(f"File generated for {starname}!\n")
+
+    elif (get_data_psf(f"{starname}") is not None) and (get_data_masking(f"{starname}") is None): # Only psf
+        kp_mags_psf = get_data_psf(starname)[1:]
+        data = Table(data = [sep_vals_psf, kp_mags_psf], names = ["Sep", "Contrast"])
+        
+        export_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/MOLUSC Inputs/Data Parser Tables')
+        
+        filelist = glob.glob(os.path.join(export_dir, f"{starname}.txt"))
+   
+        if len(filelist) >= 1: # File found!
+            print(f"Error: file detected for {starname}\n")
+            return None
+        elif len(filelist) == 0: # No file has been previously generated
+            data.write(os.path.join(export_dir, f"{starname}.txt"), format = 'ascii.basic', delimiter = ' ', overwrite=True)
+            print(f"File generated for {starname}!\n")
+
 
 if __name__ == "__main__":
     # JS355 is the "control" -- it tends to work without problems
     # AD_0738 is experimental -- it's name changes between data sets due to the difference in formatting between them
     # EPIC211998192 is experimental -- it's name format also changes between data sets
-    # HSHJ300 is experimental -- it has a masking file but has no masking data; it has no PSF data
+    # HSHJ300 is experimental -- it has a masking file but has no masking data; it has PSF data for Kp and J
     
     
     # masking = get_data_masking("JS355")
+    # print(masking)
+
     # masking = get_data_masking("AD_0738")
+    # print(masking)
+
     # masking = get_data_masking("EPIC211998192")
+    # print(masking)
+
     # masking = get_data_masking("HSHJ300")
-
-
     # print(masking)
 
     # print()
 
-
     # psf = get_data_psf("JS355")
+    # print(psf)
+
     # psf = get_data_psf("AD_0738")
+    # print(psf)
+
     # psf = get_data_psf("EPIC211998192")
+    # print(psf)
+
     # psf = get_data_psf("HSHJ300")
     # print(psf)
 
@@ -208,116 +282,80 @@ if __name__ == "__main__":
     # plot_star("EPIC211998192")
     # plot_star("HSHJ300")
 
+    # print()
+    
+    # export_star("JS355")
+    # print(export)
+
+    # print()
+ 
     # Plot all targets:
+    # targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
+    # try:
+    #     fig, ax = plt.subplots()
+    #     for name, obsdate in targets.iterrows():
+    #         print("Name:", name, "Obsdate:", obsdate[14])
+    #         if not pd.isnull(obsdate[14]):
+    #             star = name.replace(" ", "_")
+    #             # print(star)
+    #             plot_star(star, ax)
+    #         else:
+    #             print(f"Plot not generated for {name} (no observation date)")
+    # except KeyboardInterrupt:
+    #     plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
+    #     ax.set_xlabel("Seperation Values (mas)")
+    #     ax.set_ylabel("\u0394 Kp Magnitudes")
+    #     if ax.get_ylim()[0] < ax.get_ylim()[1]:
+    #         ax.invert_yaxis()
+    #     plt.grid(visible = True)
+    #     plt.show()
+    #     plt.close("all")
+    # else:
+    #     plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
+    #     ax.set_xlabel("Seperation Values (mas)")
+    #     ax.set_ylabel("\u0394 Kp Magnitudes")
+    #     if ax.get_ylim()[0] < ax.get_ylim()[1]:
+    #         ax.invert_yaxis()
+    #     plt.grid(visible = True)
+    #     plt.show()
+    #     plt.close("all")
+
+
+    # Export all targets to its own file that MOLUSC can take
+    list_plot = []
+    list_exp_masking = []
+    list_exp_psf = []
+    
     targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
-    try:
-        fig, ax = plt.subplots()
-        for name, obsdate in targets.iterrows():
-            if not pd.isnull(obsdate[0]):
+    for name, obsdate in targets.iterrows():
+        print("Name:", name, "Obsdate:", obsdate[14])
+        if not pd.isnull(obsdate[14]):
+            
+            if get_data_masking(name) is not None: # Has masking data
+                export_star(name)
                 star = name.replace(" ", "_")
-                print(star)
-                plot_star(star, ax)
-    except KeyboardInterrupt:
-        plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
-        ax.set_xlabel("Seperation Values (mas)")
-        ax.set_ylabel("\u0394 Kp Magnitudes")
-        if ax.get_ylim()[0] < ax.get_ylim()[1]:
-            ax.invert_yaxis()
-        plt.grid(visible = True)
-        plt.show()
-        plt.close("all")
-    else:
-        plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
-        ax.set_xlabel("Seperation Values (mas)")
-        ax.set_ylabel("\u0394 Kp Magnitudes")
-        if ax.get_ylim()[0] < ax.get_ylim()[1]:
-            ax.invert_yaxis()
-        plt.grid(visible = True)
-        plt.show()
-        plt.close("all")
+                print(star, "\n")
+                list_exp_masking.append(star)
+            else: # No masking data :(
+                star = name.replace(" ", "_")
+                print(f"No masking data for {name}")
+                print(star, "\n")
+            
+            if get_data_psf(name) is not None: # Has psf data
+                export_star(name)  
+                star = name.replace(" ", "_")
+                print(star, "\n")
+                list_exp_psf.append(star)
+            else: # No psf data :(
+                star = name.replace(" ", "_")
+                print(f" No PSF data for {name}")    
+                print(star, "\n")
+        else:
+            print(f"File not generated for {name} (no observation date)\n")
 
-# List of targets confirmed to be MISSING from the PSF data:
-    # JS256
-    # KW573
-    # JS105
-    # JS188
-    # JC105
-    # JS706
-    # JS344
-    # AD 2902
-    # EPIC 212011731
-    # AD 3349
-    # AD 1215
-    # HSHJ197
-    # JS391
-    # JS416
-    # JS434
-    # JS490
-    # JS 27
-    # JS284
-    # JS475
-    # JS 22
-    # JS126
-    # JS163
-    # JS506
-    # AD 1695
-    # AD 2759
-    # AD 1423
-    # JS384
-    # JS489
-    # AD 1026
-    # JS206
-    # AD 2371
-    # JS411
-    # JS427
-    # JS457
-    # JS542
-    # JS 19
-    # JS110
-    # EPIC 212011557
-    # HSHJ393
-    # JS564
-    # JS609
-    # JS281
-    # JS534
-    # JS557
-    # JS613
-    # JS649
-    # AD 3962
-    # JS240
-    # AD 1240
-    # JS597
-    # AD 1508
-    # JS159
-    # HSHJ 15
-    # KW570
-    # KW566
-    # JS497
-    # JS 45
-    # JS 97
-    # JS586
-    # HSHJ  7
-    # JS107
-    # JS118
-    # JS140
-    # JS180
-    # JS244
-    # JS353
-    # JS595
-    # AD 4129
-    # AD 4242
-    # JS 35
-    # JS112
-    # AD 2250
-    # JS227
-    # JS340
-    # JS462
-    # JS548
-    
-# Targets INCLUDED in PSF data but from different PI:
-    # JS260
-    
+    # print("# of plots:", len(list_plot))
+    print("# of exports:", len(list_exp_psf), len(list_exp_masking))
 
-    # Continue checking why so many PSF plots aren't being generated!
-    # Export the data to a file that MOLUSC can take
-        # Create a separate file for each star. Put them in a separate folder with a good naming convention!
+
+# To do next:
+# Output data with J filter as well
