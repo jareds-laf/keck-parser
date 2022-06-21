@@ -200,11 +200,11 @@ def export_star(starname): # Export the data to a file that MOLUSC can take. Lot
         
         # Export the data to a file, so long as there is not already a file for the star
         export_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/MOLUSC Inputs/Data Parser Tables')
-
+        starname = name.replace(" ", "_")
         filelist = glob.glob(os.path.join(export_dir, f"{starname}.txt"))
         
         if len(filelist) >= 1: # File found!
-            print(f"Error: file detected for {starname}\n")
+            print(f"{starname} file generation skipped; file detected\n")
             return None
         elif len(filelist) == 0: # No file has been previously generated
             data.write(os.path.join(export_dir, f"{starname}.txt"), format = 'ascii.basic', delimiter = ' ', overwrite=True)
@@ -216,7 +216,7 @@ def export_star(starname): # Export the data to a file that MOLUSC can take. Lot
         data = Table(data = [sep_vals_masking, kp_mags_masking], names = ["Sep", "Contrast"])
         
         export_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/MOLUSC Inputs/Data Parser Tables')
-        
+        starname = name.replace(" ", "_")
         filelist = glob.glob(os.path.join(export_dir, f"{starname}.txt"))
 
         if len(filelist) >= 1: # File found!
@@ -231,7 +231,7 @@ def export_star(starname): # Export the data to a file that MOLUSC can take. Lot
         data = Table(data = [sep_vals_psf, kp_mags_psf], names = ["Sep", "Contrast"])
         
         export_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/MOLUSC Inputs/Data Parser Tables')
-        
+        starname = name.replace(" ", "_")
         filelist = glob.glob(os.path.join(export_dir, f"{starname}.txt"))
    
         if len(filelist) >= 1: # File found!
@@ -329,11 +329,11 @@ if __name__ == "__main__":
     targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
     for name, obsdate in targets.iterrows():
         print("Name:", name, "Obsdate:", obsdate[14])
-        if not pd.isnull(obsdate[14]):
+        if not pd.isnull(obsdate[14]): # Only try for stars we have data with
             
             if get_data_masking(name) is not None: # Has masking data
+                star = name.replace(" ", "_")    
                 export_star(name)
-                star = name.replace(" ", "_")
                 print(star, "\n")
                 list_exp_masking.append(star)
             else: # No masking data :(
@@ -342,15 +342,16 @@ if __name__ == "__main__":
                 print(star, "\n")
             
             if get_data_psf(name) is not None: # Has psf data
-                export_star(name)  
                 star = name.replace(" ", "_")
+                export_star(name)  
                 print(star, "\n")
                 list_exp_psf.append(star)
             else: # No psf data :(
                 star = name.replace(" ", "_")
                 print(f" No PSF data for {name}")    
                 print(star, "\n")
-        else:
+                
+        else: # We don't have data!
             print(f"File not generated for {name} (no observation date)\n")
 
     # print("# of plots:", len(list_plot))
