@@ -199,8 +199,8 @@ def export_star(starname): # Export the data to a file that MOLUSC can take. Lot
         data = Table(data = [sep_vals_all, kp_mags_all], names = ["Sep", "Contrast"])
         
         # Export the data to a file, so long as there is not already a file for the star
-        export_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/MOLUSC Inputs/Data Parser Tables')
-        starname = name.replace(" ", "_")
+        export_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/MOLUSC/Data Parser Tables')
+        starname = starname.replace(" ", "_")
         filelist = glob.glob(os.path.join(export_dir, f"{starname}.txt"))
         
         if len(filelist) >= 1: # File found!
@@ -215,12 +215,12 @@ def export_star(starname): # Export the data to a file that MOLUSC can take. Lot
         kp_mags_masking = get_data_masking(starname)[1:]
         data = Table(data = [sep_vals_masking, kp_mags_masking], names = ["Sep", "Contrast"])
         
-        export_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/MOLUSC Inputs/Data Parser Tables')
-        starname = name.replace(" ", "_")
+        export_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/MOLUSC/Data Parser Tables')
+        starname = starname.replace(" ", "_")
         filelist = glob.glob(os.path.join(export_dir, f"{starname}.txt"))
 
         if len(filelist) >= 1: # File found!
-            print(f"Error: file detected for {starname}\n")
+            print(f"{starname} file generation skipped; file detected\n")
             return None
         elif len(filelist) == 0: # No file has been previously generated
             data.write(os.path.join(export_dir, f"{starname}.txt"), format = 'ascii.basic', delimiter = ' ', overwrite=True)
@@ -230,19 +230,19 @@ def export_star(starname): # Export the data to a file that MOLUSC can take. Lot
         kp_mags_psf = get_data_psf(starname)[1:]
         data = Table(data = [sep_vals_psf, kp_mags_psf], names = ["Sep", "Contrast"])
         
-        export_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/MOLUSC Inputs/Data Parser Tables')
-        starname = name.replace(" ", "_")
+        export_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/MOLUSC/Data Parser Tables')
+        starname = starname.replace(" ", "_")
         filelist = glob.glob(os.path.join(export_dir, f"{starname}.txt"))
    
         if len(filelist) >= 1: # File found!
-            print(f"Error: file detected for {starname}\n")
+            print(f"{starname} file generation skipped; file detected\n")
             return None
         elif len(filelist) == 0: # No file has been previously generated
             data.write(os.path.join(export_dir, f"{starname}.txt"), format = 'ascii.basic', delimiter = ' ', overwrite=True)
             print(f"File generated for {starname}!\n")
 
-
 if __name__ == "__main__":
+    #%% Basic function testing
     # JS355 is the "control" -- it tends to work without problems
     # AD_0738 is experimental -- it's name changes between data sets due to the difference in formatting between them
     # EPIC211998192 is experimental -- it's name format also changes between data sets
@@ -289,40 +289,40 @@ if __name__ == "__main__":
 
     # print()
  
-    # Plot all targets:
-    targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
-    try:
-        fig, ax = plt.subplots()
-        for name, obsdate in targets.iterrows():
-            print("Name:", name, "Obsdate:", obsdate[14])
-            if not pd.isnull(obsdate[14]):
-                star = name.replace(" ", "_")
-                # print(star)
-                plot_star(star, ax)
-            else:
-                print(f"Plot not generated for {name} (no observation date)")
-    except KeyboardInterrupt:
-        plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
-        ax.set_xlabel("Seperation Values (mas)")
-        ax.set_ylabel("\u0394 Kp Magnitudes")
-        if ax.get_ylim()[0] < ax.get_ylim()[1]:
-            ax.invert_yaxis()
-        plt.grid(visible = True)
-        plt.show()
-        plt.close("all")
-    else:
-        plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
-        ax.set_xlabel("Seperation Values (mas)")
-        ax.set_ylabel("\u0394 Kp Magnitudes")
-        if ax.get_ylim()[0] < ax.get_ylim()[1]:
-            ax.invert_yaxis()
-        plt.grid(visible = True)
-        plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.pdf'))
-        plt.show()
-        plt.close("all")
+    #%% Plot all targets:
+    # targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
+    # try:
+    #     fig, ax = plt.subplots()
+    #     for name, obsdate in targets.iterrows():
+    #         print("Name:", name, "Obsdate:", obsdate[14])
+    #         if not pd.isnull(obsdate[14]):
+    #             star = name.replace(" ", "_")
+    #             # print(star)
+    #             plot_star(star, ax)
+    #         else:
+    #             print(f"Plot not generated for {name} (no observation date)")
+    # except KeyboardInterrupt:
+    #     plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
+    #     ax.set_xlabel("Seperation Values (mas)")
+    #     ax.set_ylabel("\u0394 Kp Magnitudes")
+    #     if ax.get_ylim()[0] < ax.get_ylim()[1]:
+    #         ax.invert_yaxis()
+    #     plt.grid(visible = True)
+    #     plt.show()
+    #     plt.close("all")
+    # else:
+    #     plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
+    #     ax.set_xlabel("Seperation Values (mas)")
+    #     ax.set_ylabel("\u0394 Kp Magnitudes")
+    #     if ax.get_ylim()[0] < ax.get_ylim()[1]:
+    #         ax.invert_yaxis()
+    #     plt.grid(visible = True)
+    #     plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.pdf'))
+    #     plt.show()
+    #     plt.close("all")
 
 
-    # Export all targets to its own file that MOLUSC can take
+    #%% Export all targets to its own file that MOLUSC can take
     # list_plot = []
     # list_exp_masking = []
     # list_exp_psf = []
@@ -334,7 +334,7 @@ if __name__ == "__main__":
             
     #         if get_data_masking(name) is not None: # Has masking data
     #             star = name.replace(" ", "_")    
-    #             export_star(name)
+    #             # export_star(name)
     #             print(star, "\n")
     #             list_exp_masking.append(star)
     #         else: # No masking data :(
@@ -343,8 +343,7 @@ if __name__ == "__main__":
     #             print(star, "\n")
             
     #         if get_data_psf(name) is not None: # Has psf data
-    #             star = name.replace(" ", "_")
-    #             export_star(name)  
+    #             # export_star(name)  
     #             print(star, "\n")
     #             list_exp_psf.append(star)
     #         else: # No psf data :(
@@ -355,9 +354,41 @@ if __name__ == "__main__":
     #     else: # We don't have data!
     #         print(f"File not generated for {name} (no observation date)\n")
 
-    # # print("# of plots:", len(list_plot))
+    # print("# of plots:", len(list_plot))
     # print("# of exports:", len(list_exp_psf), len(list_exp_masking))
+    # print("PSF exports:", list_exp_psf)
+    
+    
+    #%% Get get list of all targets Gaia EDR3, DR2, and 2MASS designations
+    simbad = Table.read(os.path.expanduser(r"G:/Shared drives/DouglasGroup/data/keck_psf_detections_praesepe/Keck_Targets_2018B_Simbad.csv"))
+    
+    csv_path = r"G:/Shared drives/DouglasGroup/Jared Sofair 2022/CSV Files"
+    pm = Table.read(os.path.join(csv_path, r'Praesepe_Merged.csv'))
+    
+    all_exports = ['AD_1427', 'AD_2354', 'AD_2595', 'AD_3663', 'EPIC211885995', 'HSHJ510', 'JS117', 'JS169', 'JS178', 'JS181', 'JS191', 'JS301', 'JS317', 'JS318', 'JS352', 'JS355', 'JS373', 'JS394', 'JS405', 'JS432', 'JS513', 'JS533', 'JS545', 'JS552', 'JS582', 'JS620', 'JS649', 'KW569', 'AD_0738', 'AD_3411', 'JS_46', 'JS113', 'JS230', 'JS364', 'JS430', 'JS452', 'KW564', 'AD_1660', 'EPIC211998192', 'EPIC212011416', 'EPIC212127087', 'HSHJ300', 'JS119', 'JS148', 'JS174', 'JS187', 'JS200', 'JS232', 'JS246', 'JS415', 'JS468', 'JS488', 'JS505', 'JS541', 'JS550', 'JS689']
 
+    desig_gaia_dr2_all = []
+    desig_2mass_all = []
+    simbad_row_index_list = []
+    j=0
+    
+    for item in all_exports:
+        # Match name formatting of Praesepe Merged
+        if "_" in item:
+            item = item.replace("_", " ")
+            all_exports[j] = item
+        simbad_row_index_list.append(np.where(simbad["Name"]==item))
+        pos = simbad_row_index_list[j][0]
+        j+=1
+        
+        # Add star to appropriate list
+        desig_gaia_dr2_all.append(simbad['GaiaDR2'][j])
+        desig_2mass_all.append(simbad['2MASS'][j])
 
-# To do next:
+    #%%% Export the list of targets
+    # np.savetxt(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/CSV Files/targets_gaia_dr2.csv'), desig_gaia_dr2_all, fmt='%s', delimiter=',')
+    # np.savetxt(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/CSV Files/targets_2mass.csv'), desig_2mass_all, fmt='%s', delimiter=',')
+    # np.savetxt(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/CSV Files/targets_keck.csv'), all_exports, fmt='%s', delimiter=',')
+
+#%% To do:
 # Output data with J filter as well

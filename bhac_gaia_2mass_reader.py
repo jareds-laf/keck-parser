@@ -17,6 +17,7 @@ import linecache as lc
 input_path = os.path.expanduser(r"G:/Shared drives/DouglasGroup/models/BHAC15")
 output_path = os.path.expanduser(r"G:/Shared drives/DouglasGroup/Jared Sofair 2022/CSV Files/BHAC Tables")
 
+
 # Try numpy loadtext
 input_file_tmass = os.path.join(input_path, r"BHAC15_iso.2mass")
 input_file_gaia = os.path.join(input_path, r"BHAC15_iso.GAIA")
