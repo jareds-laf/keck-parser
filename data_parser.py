@@ -317,6 +317,7 @@ if __name__ == "__main__":
         if ax.get_ylim()[0] < ax.get_ylim()[1]:
             ax.invert_yaxis()
         plt.grid(visible = True)
+        plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.pdf'))
         plt.show()
         plt.close("all")
 
