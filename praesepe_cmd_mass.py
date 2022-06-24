@@ -11,11 +11,12 @@ from astropy.table import Table, Column
 from scipy.interpolate import interp1d
 
 # Read in necessasry csv files
-csv_path = r"G:/Shared drives/DouglasGroup/Jared Sofair 2022/CSV Files"
-pm = Table.read(os.path.join(csv_path, r'Praesepe_Merged.csv'))
-bhac_gaia = Table.read(os.path.join(csv_path, r"BHAC Tables/BHAC_GAIA.csv"))
-bhac_2mass = Table.read(os.path.join(csv_path, r"BHAC Tables/BHAC_2MASS.csv"))
-
+csv_path_drive = r"G:/Shared drives/DouglasGroup/Jared Sofair 2022/CSV Files"
+csv_path_github = r"C:/Users/Jared/Documents/GitHub/data-parser/CSV Files"
+pm = Table.read(os.path.join(csv_path_drive, r'Praesepe_Merged.csv'))
+bhac_gaia = Table.read(os.path.join(csv_path_drive, r"BHAC Tables/BHAC_GAIA.csv"))
+bhac_2mass = Table.read(os.path.join(csv_path_drive, r"BHAC Tables/BHAC_2MASS.csv"))
+targets = Table.read(os.path.join(csv_path_github, r"targets_abr.csv"))
 
 # Creating color index columns
 GminusK_pm = Column(data=pm['G']-pm['K'])
@@ -80,38 +81,54 @@ high_bin1 = pm['absG'] <= pm_binned_color1['absG'][5]
 color_bin1 = low_bin1 & high_bin1
 
 #%% Plotting G vs. BP-RP
+# fig, ax = plt.subplots()
+# ax.plot(pm['BP-RP'], pm['absG'], '.', color='#695ffa')
+# # ax.plot(pm['BP-RP'][bad_pm], pm['absG'][bad_pm], 'o', color='red') # Uncomment this and comment line 65 to see removed data
 
-# Creating 2nd plot
-fig, ax = plt.subplots()
-ax.plot(pm['BP-RP'], pm['absG'], '.', color='#695ffa')
-# ax.plot(pm['BP-RP'][bad_pm], pm['absG'][bad_pm], 'o', color='red') # Uncomment this and comment line 65 to see removed data
-
-ax.plot(bhac_gaia['BP-RP'], bhac_gaia['G'], 'o', color='pink')
-# ax.plot(bhac_gaia['BP-RP'][bad_gaia], bhac_gaia['G'][bad_gaia], 'o', color='red') # Uncomment this and comment line 69 to see removed data
+# ax.plot(bhac_gaia['BP-RP'], bhac_gaia['G'], 'o', color='pink')
+# # ax.plot(bhac_gaia['BP-RP'][bad_gaia], bhac_gaia['G'][bad_gaia], 'o', color='red') # Uncomment this and comment line 69 to see removed data
 
 
 
-# ax.plot(pm_binned_color2['BP-RP'], pm_binned_color2['absG'], 'o', color='orange')
-# ax.plot(pm['BP-RP'][color_bin2], pm['absG'][color_bin2], '.', color='green')
+# # ax.plot(pm_binned_color2['BP-RP'], pm_binned_color2['absG'], 'o', color='orange')
+# # ax.plot(pm['BP-RP'][color_bin2], pm['absG'][color_bin2], '.', color='green')
 
 
-plt.title("G vs. (BP-RP)")
-ax.set_xlabel('(BP-RP)')
-ax.set_ylabel('Absolute G Magnitude')
-ax.invert_yaxis()
+# plt.title("G vs. (BP-RP)")
+# ax.set_xlabel('(BP-RP)')
+# ax.set_ylabel('Absolute G Magnitude')
+# ax.invert_yaxis()
 
-#%% Interpolation to get masses
+#%%% Fit data to BHAC models and use interpolation to get masses
 x1 = bhac_gaia['BP-RP']
 x2 = bhac_gaia['G']
 y = bhac_gaia["M/Ms"]
 
 calc_mass_gaia_color = interp1d(x1, y)
-mass_color = calc_mass_gaia_color(bhac_gaia['BP-RP'])  # Get mass using color
-print(mass_color)
+mass_color = calc_mass_gaia_color(targets['BP-RP'])  # Get mass using color
+# print(mass_color)
 
 calc_mass_gaia_absmag = interp1d(x2, y)
-mass_absmag = calc_mass_gaia_absmag(bhac_gaia['G'])  # Get mass using absolute magnitude
-print(mass_absmag)
+mass_absmag = calc_mass_gaia_absmag(targets['absG'])  # Get mass using absolute magnitude
+# print(mass_absmag)
+
+#%%% Plot masses against each other
+fig2, ax2 = plt.subplots()
+plt.title("Masses Using Color")
+ax2.set_xlabel('Mass BP-RP')
+ax2.set_ylabel('Mass Absolute G Magnitude')
+
+ax2.plot(mass_color, mass_absmag, '.')
+
+linear = [0, 0.63]
+ax2.plot(linear, linear, '-')
+
+# plot mass from color vs. mass from abs mag
+# make a 1-1 linear line (y=x) that spans the data
+
+# 
+
+# ax.plot(x1, y, 'o')
 
 # Writing pm to a .csv file to ensure that I did everything properly
 # pm.write(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/CSV Files/TestingPM.csv', overwrite = True) # Make sure you close this .csv file before running!

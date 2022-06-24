@@ -386,9 +386,11 @@ if __name__ == "__main__":
         desig_2mass_all.append(simbad['2MASS'][j])
 
     #%%% Export the list of targets
-    # np.savetxt(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/CSV Files/targets_gaia_dr2.csv'), desig_gaia_dr2_all, fmt='%s', delimiter=',')
-    # np.savetxt(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/CSV Files/targets_2mass.csv'), desig_2mass_all, fmt='%s', delimiter=',')
-    # np.savetxt(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/CSV Files/targets_keck.csv'), all_exports, fmt='%s', delimiter=',')
-
+    # np.savetxt(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/CSV Files/targets_gaia_dr2.csv'), desig_gaia_dr2_all, header="desig_gaia_dr2", fmt='%s', delimiter=',')
+    # np.savetxt(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/CSV Files/targets_2mass.csv'), desig_2mass_all,  header="desig_2mass", fmt='%s', delimiter=',')
+    # np.savetxt(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/CSV Files/targets_keck.csv'), all_exports,  header="name", fmt='%s', delimiter=',')
+    
+    df = pd.DataFrame({"name" : all_exports, "desig_2mass" : desig_2mass_all, "desig_gaia_dr2" : desig_gaia_dr2_all})
+    df.to_csv(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/CSV Files/targets_names.csv'), index=False)
 #%% To do:
 # Output data with J filter as well
