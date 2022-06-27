@@ -22,9 +22,9 @@ Script to get absolute G magnitude and BP-RP color from praesepe_merged (pm) tab
 For converting from apparent magnitude to absolute magnitude, the distances given in pm were used.
 
 ## 5. CSV Files [WIP]
-###praesepe_merged.csv
+### praesepe_merged.csv
 
-###targets_abr.csv
+### targets_abr.csv
 Collection of data from our targets:
   Keck names (from Keck_Targets_2018B_Simbad.csv),
   2MASS designation (from pm),
