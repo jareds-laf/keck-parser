@@ -11,8 +11,8 @@ from astropy.table import Table, Column
 from scipy.interpolate import interp1d
 
 # Read in necessasry csv files
-csv_path_drive = r"G:/Shared drives/DouglasGroup/Jared Sofair 2022/CSV Files"
-csv_path_github = r"C:/Users/Jared/Documents/GitHub/data-parser/CSV Files"
+csv_path_drive = os.path.expanduser(r"G:/Shared drives/DouglasGroup/Jared Sofair 2022/CSV Files")
+csv_path_github = os.path.expanduser(r"C:/Users/Jared/Documents/GitHub/data-parser/CSV Files")
 pm = Table.read(os.path.join(csv_path_drive, r'Praesepe_Merged.csv'))
 bhac_gaia = Table.read(os.path.join(csv_path_drive, r"BHAC Tables/BHAC_GAIA.csv"))
 bhac_2mass = Table.read(os.path.join(csv_path_drive, r"BHAC Tables/BHAC_2MASS.csv"))
@@ -99,7 +99,7 @@ color_bin1 = low_bin1 & high_bin1
 # ax.set_ylabel('Absolute G Magnitude')
 # ax.invert_yaxis()
 
-#%%% Fit data to BHAC models and use interpolation to get masses
+#%% Fit data to BHAC models and use interpolation to get masses
 x1 = bhac_gaia['BP-RP']
 x2 = bhac_gaia['G']
 y = bhac_gaia["M/Ms"]
@@ -118,7 +118,10 @@ y_K = bhac_2mass["M/Ms"]
 calc_mass_2mass = interp1d(x_K, y_K)
 mass_K = calc_mass_2mass(targets['absK'])
 
+targets.add_column(mass_K, name="M/Ms")
+targets.write(os.path.join(csv_path_github, r"targets_abr.csv"), overwrite=True)
 
+# targets_abr.write(os.path.expanduser(os.path.join(csv_path, r"targets_abr.csv")), overwrite=True)
 
 #%%% Plot masses against each other
 # fig2, ax2 = plt.subplots()
@@ -143,12 +146,11 @@ plt.legend()
 plt.show()
 plt.close()
 
-# plot mass from color vs. mass from abs mag
-# make a 1-1 linear line (y=x) that spans the data
+# From the plot, it is clear that getting mass with absolute G magnitude is more accurate than with BP-RP color index
+# (at least with our sample)
 
-# 
 
-# ax.plot(x1, y, 'o')
+
 
 # Writing pm to a .csv file to ensure that I did everything properly
 # pm.write(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/CSV Files/TestingPM.csv', overwrite = True) # Make sure you close this .csv file before running!

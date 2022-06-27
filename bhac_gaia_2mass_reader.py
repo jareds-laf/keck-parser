@@ -17,7 +17,8 @@ from numpy import genfromtxt
 # Path of files
 input_path = os.path.expanduser(r"G:/Shared drives/DouglasGroup/models/BHAC15")
 output_path = os.path.expanduser(r"G:/Shared drives/DouglasGroup/Jared Sofair 2022/CSV Files/BHAC Tables")
-
+# How to flexibly identify a user's google drive across OS's?
+# How does google drive for desktop storage interact with your native storage?
 
 # Try numpy loadtext
 input_file_tmass = os.path.join(input_path, r"BHAC15_iso.2mass")

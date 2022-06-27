@@ -5,7 +5,7 @@ Created on Fri Jun 24 16:11:19 2022
 @author: Jared
 """
 
-from data_parser import get_data_masking, get_data_psf, plot_star, export_star
+from keck_parser import get_data_masking, get_data_psf, plot_star, export_star
 import os
 import numpy as np
 import linecache as lc
@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import re
 
-#%% Former data_parser.py actions
+#%% Former keck_parser.py actions
 #%%% Plot all targets
 # targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
 # try:
@@ -30,8 +30,8 @@ import re
 #         else:
 #             print(f"Plot not generated for {name} (no observation date)")
 # except KeyboardInterrupt:
-#     plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
-#     ax.set_xlabel("Seperation Values (mas)")
+#     plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
+#     ax.set_xlabel("Separation Values (mas)")
 #     ax.set_ylabel("\u0394 Kp Magnitudes")
 #     if ax.get_ylim()[0] < ax.get_ylim()[1]:
 #         ax.invert_yaxis()
@@ -39,13 +39,14 @@ import re
 #     plt.show()
 #     plt.close("all")
 # else:
-#     plt.title("\u0394 Kp Magnitude vs. Seperation", fontsize = 12)
-#     ax.set_xlabel("Seperation Values (mas)")
+#     plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
+#     ax.set_xlabel("Separation Values (mas)")
 #     ax.set_ylabel("\u0394 Kp Magnitudes")
 #     if ax.get_ylim()[0] < ax.get_ylim()[1]:
 #         ax.invert_yaxis()
 #     plt.grid(visible = True)
-#     # plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.pdf'))
+#     plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.pdf'))
+#     plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.png'))
 #     plt.show()
 #     plt.close("all")
 
@@ -123,10 +124,10 @@ import re
 
 
 
-#%% Get absG mag and BP-RP from praesepe_merged
-csv_path = r"C:\Users\Jared\Documents\GitHub\data-parser\CSV Files"
-pm = Table.read(os.path.join(csv_path, r'praesepe_merged.csv'))
-targets_abr = Table.read(os.path.join(csv_path, r'targets_abr.csv'))
+#%% Get absG mag, absK mag, and BP-RP from praesepe_merged
+# csv_path = r"C:\Users\Jared\Documents\GitHub\data-parser\CSV Files"
+# pm = Table.read(os.path.join(csv_path, r'praesepe_merged.csv'))
+# targets_abr = Table.read(os.path.join(csv_path, r'targets_abr.csv'))
 # targets_gaia = os.path.expanduser(os.path.join(csv_path, r'targets_gaia_dr2.csv'))
 # targets_2mass = os.path.expanduser(os.path.join(csv_path, r'targets_2mass.csv'))
 # targets_names = Table.read(os.path.expanduser(os.path.join(csv_path, r'targets_names.csv')))
@@ -134,13 +135,13 @@ targets_abr = Table.read(os.path.join(csv_path, r'targets_abr.csv'))
 # table_gaia = Table.read(targets_gaia, names=["Name"], data_start=0)
 # table_2mass = Table.read(targets_2mass, names=["Name"], data_start=0)
 
-pm_row_index_list = []
+# pm_row_index_list = []
 # apparentG_list = []
 # apparentK_list = []
 # BPminRP_list = []
 # absG_list = []
-absK_list = []
-pos_list = []
+# absK_list = []
+# pos_list = []
 
 # names_gaia = table_gaia["Name"][1:].data
 # names_2mass = table_2mass["Name"][1:].data
@@ -201,14 +202,14 @@ pos_list = []
 # print(targets_abr["desig_2mass"])
 # print(pm["name"][92])
 
-n=0
-for ind in targets_abr["pm_index"]:
-    apparentK = pm["K"][ind]
-    # print(apparentK)
-    absK_mag = apparentK - 5*np.log10(pm['D'][ind]) + 5 # absmag = appmag - 5*log(D) + 5
-    # print(absK_mag)
-    absK_list.append(absK_mag)
-    n+=1
+# n=0
+# for ind in targets_abr["pm_index"]:
+#     apparentK = pm["K"][ind]
+#     # print(apparentK)
+#     absK_mag = apparentK - 5*np.log10(pm['D'][ind]) + 5 # absmag = appmag - 5*log(D) + 5
+#     # print(absK_mag)
+#     absK_list.append(absK_mag)
+#     n+=1
 # print(absK_list)
 
 # targets_mag_color.add_column(absG_list, name="absK")
@@ -216,8 +217,7 @@ for ind in targets_abr["pm_index"]:
 
 # targets_abr = join(targets_names, targets_mag_color, join_type="outer")
 
-targets_abr.add_column(absK_list, name="absK")
-targets_abr.write(os.path.expanduser(os.path.join(csv_path, r"targets_abr.csv")), overwrite=True)
+# targets_abr.add_column(absK_list, name="absK")
+# targets_abr.write(os.path.expanduser(os.path.join(csv_path, r"targets_abr.csv")), overwrite=True)
 
 # targets_mag_color.write(os.path.expanduser(os.path.join(csv_path, r"targets_mag_color.csv")), overwrite=True)
-#%% Get K magnitudes from 2MASS data
