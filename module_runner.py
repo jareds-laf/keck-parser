@@ -148,14 +148,15 @@ pos_list = []
 #%%% Get list of indeces for each target star using 2MASS names
 # targets_mag_color = Table()
 
-j=0
-for star in targets_abr["desig_2mass"]:
-    pm_row_index_list.append(np.where(pm["name"]==star))
-    pos = pm_row_index_list[j][0]
-    pos_list.append(pos)
+# j=0
+# for star in targets_abr["desig_2mass"]:
+#     pm_row_index_list.append(np.where(pm["name"]==star))
+#     pos = pm_row_index_list[j][0]
+#     print(pm["name"][pos])
+#     pos_list.append(pos)
     
-    pos_list[j] = pos_list[j][0]
-    print(pos_list[j])
+    # pos_list[j] = pos_list[j][0]
+    # print(pos_list[j], pm["name"][pos])
     # print(pos_list[j][0])
     
     # pos_list.append(pm_row_index_list[j][0])
@@ -173,9 +174,9 @@ for star in targets_abr["desig_2mass"]:
 #     # Get BP-RP for each target
 #     BPminRP_list.append(float(pm["BP"][pos]-pm["RP"][pos]))
     
-    j+=1
-
-targets_abr.add_column(pos_list, name="pm_index")
+    # j+=1
+    
+# targets_abr.add_column(pos_list, name="pm_index")
 
 #%%% Convert apparent G mag to absolute G mag
 # k=0
@@ -197,25 +198,25 @@ targets_abr.add_column(pos_list, name="pm_index")
 # targets_mag_color.write(os.path.expanduser(os.path.join(csv_path, r"targets_mag_color.csv")), overwrite=True)
 
 #%%% Convert apparent K mag to absolute K mag
+# print(targets_abr["desig_2mass"])
+# print(pm["name"][92])
 
+n=0
+for ind in targets_abr["pm_index"]:
+    apparentK = pm["K"][ind]
+    # print(apparentK)
+    absK_mag = apparentK - 5*np.log10(pm['D'][ind]) + 5 # absmag = appmag - 5*log(D) + 5
+    # print(absK_mag)
+    absK_list.append(absK_mag)
+    n+=1
+# print(absK_list)
 
-# n=0
-# for star in targets_abr["desig_2mass"]:
-#     pos = pm_row_index_list[n][0]
-#     print(pos)
-# #     absK_mag = value - 5*np.log10(pm['D'][pos]) + 5 # absmag = appmag - 5*log(D) + 5
-# #     absK_list.append(absK_mag[0])
-#     n+=1
-
-# targets_mag_color.add_column(names_2mass, name="desig_2mass")
-# targets_mag_color.add_column(BPminRP_list, name="BP-RP")
-# targets_mag_color.add_column(absG_list, name="absG")
 # targets_mag_color.add_column(absG_list, name="absK")
 
 
 # targets_abr = join(targets_names, targets_mag_color, join_type="outer")
 
-
+targets_abr.add_column(absK_list, name="absK")
 targets_abr.write(os.path.expanduser(os.path.join(csv_path, r"targets_abr.csv")), overwrite=True)
 
 # targets_mag_color.write(os.path.expanduser(os.path.join(csv_path, r"targets_mag_color.csv")), overwrite=True)

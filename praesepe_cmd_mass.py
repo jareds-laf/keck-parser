@@ -112,16 +112,36 @@ calc_mass_gaia_absmag = interp1d(x2, y)
 mass_absmag = calc_mass_gaia_absmag(targets['absG'])  # Get mass using absolute magnitude
 # print(mass_absmag)
 
+x_K = bhac_2mass["Mk"]
+y_K = bhac_2mass["M/Ms"]
+
+calc_mass_2mass = interp1d(x_K, y_K)
+mass_K = calc_mass_2mass(targets['absK'])
+
+
+
 #%%% Plot masses against each other
+# fig2, ax2 = plt.subplots()
+# plt.title("Masses Using Color")
+# ax2.set_xlabel('Mass BP-RP')
+# ax2.set_ylabel('Mass Absolute G Magnitude')
+
+# ax2.plot(mass_color, mass_absmag, '.')
+
+# linear = [0, 0.63]
+# ax2.plot(linear, linear, '-')
+
 fig2, ax2 = plt.subplots()
-plt.title("Masses Using Color")
-ax2.set_xlabel('Mass BP-RP')
-ax2.set_ylabel('Mass Absolute G Magnitude')
-
-ax2.plot(mass_color, mass_absmag, '.')
-
-linear = [0, 0.63]
+plt.title("Masses Using Absolute K Magnitude")
+ax2.set_xlabel('Mass Absolute K Magnitude')
+ax2.set_ylabel('Gaia Data')
+ax2.plot(mass_color, mass_K, '.', label="BP-RP")
+ax2.plot(mass_absmag, mass_K, '.', label="absG")
+linear = [0, 0.65]
 ax2.plot(linear, linear, '-')
+plt.legend()
+plt.show()
+plt.close()
 
 # plot mass from color vs. mass from abs mag
 # make a 1-1 linear line (y=x) that spans the data
