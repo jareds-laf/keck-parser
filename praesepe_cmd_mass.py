@@ -27,14 +27,12 @@ pm.add_column(BPminusRP_pm, name = 'BP-RP')
 BPminusRP_gaia = Column(data=bhac_gaia['G_BP']-bhac_gaia['G_RP'])
 bhac_gaia.add_column(BPminusRP_gaia, name = 'BP-RP')
 
-
-# absK_2mass = Column(data=bhac_2mass['Mk'])
-# JminusK_2mass = Column(data=bhac_2mass['Mj']-bhac_2mass['Mk'])
-# bhac_2mass.add_column(JminusK_2mass, name = 'J-K')
-
 # Creating column with absolute magnitudes
 absG_pm = pm['G'] - 5*np.log10(pm['D']) + 5    # absmag = appmag - 5*log(D) + 5
 pm.add_column(absG_pm, name='absG')
+
+# Writing pm to a .csv file to ensure that I did things properly
+# pm.write(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/CSV Files/TestingPM.csv', overwrite = True) # Make sure you close this .csv file before running!
 
 #%% Removing irrelevant stars
 
@@ -98,75 +96,3 @@ bhac_gaia.remove_rows(np.where(bad_gaia)[0])
 # ax.set_xlabel('(BP-RP)')
 # ax.set_ylabel('Absolute G Magnitude')
 # ax.invert_yaxis()
-
-#%% Fit data to BHAC models and use interpolation to get masses
-x1 = bhac_gaia['BP-RP']
-x2 = bhac_gaia['G']
-y = bhac_gaia["M/Ms"]
-
-calc_mass_gaia_color = interp1d(x1, y)
-mass_color = calc_mass_gaia_color(targets['BP-RP'])  # Get mass using color
-# print(mass_color)
-
-calc_mass_gaia_absmag = interp1d(x2, y)
-mass_absmag = calc_mass_gaia_absmag(targets['absG'])  # Get mass using absolute magnitude
-# print(mass_absmag)
-
-x_K = bhac_2mass["Mk"]
-y_K = bhac_2mass["M/Ms"]
-
-calc_mass_2mass = interp1d(x_K, y_K)
-mass_K = calc_mass_2mass(targets['absK'])
-
-# targets.add_column(mass_K, name="M/Ms")
-# targets.write(os.path.join(csv_path_github, r"targets_abr.csv"), overwrite=True)
-
-#%%% Plot masses against each other
-# fig2, ax2 = plt.subplots()
-# plt.title("Masses Using Color")
-# ax2.set_xlabel('Mass BP-RP')
-# ax2.set_ylabel('Mass Absolute G Magnitude')
-
-# ax2.plot(mass_color, mass_absmag, '.')
-
-# linear = [0, 0.63]
-# ax2.plot(linear, linear, '-')
-
-# fig2, ax2 = plt.subplots()
-# plt.title("Masses Using Absolute K Magnitude")
-# ax2.set_xlabel('Mass Absolute K Magnitude')
-# ax2.set_ylabel('Gaia Data')
-# ax2.plot(mass_color, mass_K, '.', label="BP-RP")
-# ax2.plot(mass_absmag, mass_K, '.', label="absG")
-# linear = [0, 0.65]
-# ax2.plot(linear, linear, '-')
-# plt.legend()
-# plt.show()
-# plt.close()
-
-#%%% Plotting apparentK mag vs. mass to make sure the values are paired with the correct targets
-
-n=0
-for ind in targets["pm_index"]:
-    apparentK = pm["name"][ind]
-    print(apparentK, ind)
-    n+=1
-# print(targets["desig_2mass"])
-# print(pm["name"][91])
-# fig3, ax3 = plt.subplots()
-# plt.title("Masses vs. Apparent K Magnitude")
-# ax3.set_xlabel('Mass Apparent K Magnitude')
-# ax3.set_ylabel('Mass')
-# ax3.plot(mass_color, mass_K, '.', label="BP-RP")
-# ax3.plot(mass_absmag, mass_K, '.', label="absG")
-# linear = [0, 0.65]
-# ax3.plot(linear, linear, '-')
-# plt.legend()
-# plt.show()
-# plt.close()
-
-# From the plot, it is clear that getting mass with absolute G magnitude is more accurate than with BP-RP color index
-# (at least with our sample)
-
-# Writing pm to a .csv file to ensure that I did everything properly
-# pm.write(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/CSV Files/TestingPM.csv', overwrite = True) # Make sure you close this .csv file before running!
