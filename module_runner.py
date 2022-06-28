@@ -87,31 +87,114 @@ import re
 # print("# of plots:", len(list_plot))
 # print("# of exports:", len(list_exp_psf), len(list_exp_masking))
 # print("PSF exports:", list_exp_psf)
-#%%% Get get list of all targets Gaia EDR3, DR2, and 2MASS designations
-# simbad = Table.read(os.path.expanduser(r"G:/Shared drives/DouglasGroup/data/keck_psf_detections_praesepe/Keck_Targets_2018B_Simbad.csv"))
+#%% Create targets_abr.csv
+csv_path_github = os.path.expanduser(r"C:\Users\Jared\Documents\GitHub\data-parser\CSV Files")
+csv_path_drive = r"G:/Shared drives/DouglasGroup/Jared Sofair 2022/CSV Files"
+simbad = Table.read(os.path.expanduser(r"G:/Shared drives/DouglasGroup/data/keck_psf_detections_praesepe/Keck_Targets_2018B_Simbad.csv"))
 
-# csv_path = r"G:/Shared drives/DouglasGroup/Jared Sofair 2022/CSV Files"
-# pm = Table.read(os.path.join(csv_path, r'Praesepe_Merged.csv'))
+pm = Table.read(os.path.join(csv_path_github, r'praesepe_merged.csv'))
 
-# all_exports = ['AD_1427', 'AD_2354', 'AD_2595', 'AD_3663', 'EPIC211885995', 'HSHJ510', 'JS117', 'JS169', 'JS178', 'JS181', 'JS191', 'JS301', 'JS317', 'JS318', 'JS352', 'JS355', 'JS373', 'JS394', 'JS405', 'JS432', 'JS513', 'JS533', 'JS545', 'JS552', 'JS582', 'JS620', 'JS649', 'KW569', 'AD_0738', 'AD_3411', 'JS_46', 'JS113', 'JS230', 'JS364', 'JS430', 'JS452', 'KW564', 'AD_1660', 'EPIC211998192', 'EPIC212011416', 'EPIC212127087', 'HSHJ300', 'JS119', 'JS148', 'JS174', 'JS187', 'JS200', 'JS232', 'JS246', 'JS415', 'JS468', 'JS488', 'JS505', 'JS541', 'JS550', 'JS689']
+names = ['AD_1427', 'AD_2354', 'AD_2595', 'AD_3663', 'EPIC211885995', 'HSHJ510', 'JS117', 'JS169', 'JS178', 'JS181', 'JS191', 'JS301', 'JS317', 'JS318', 'JS352', 'JS355', 'JS373', 'JS394', 'JS405', 'JS432', 'JS513', 'JS533', 'JS545', 'JS552', 'JS582', 'JS620', 'JS649', 'KW569', 'AD_0738', 'AD_3411', 'JS_46', 'JS113', 'JS230', 'JS364', 'JS430', 'JS452', 'KW564', 'AD_1660', 'EPIC211998192', 'EPIC212011416', 'EPIC212127087', 'HSHJ300', 'JS119', 'JS148', 'JS174', 'JS187', 'JS200', 'JS232', 'JS246', 'JS415', 'JS468', 'JS488', 'JS505', 'JS541', 'JS550', 'JS689']
 
-# desig_gaia_dr2_all = []
-# desig_2mass_all = []
-# simbad_row_index_list = []
-# j=0
+desig_gaia_dr2_all = []
+desig_2mass_all = []
+simbad_row_index_list = []
+pm_index_list = []
+targets_abr = Table()
 
-# for item in all_exports:
-#     # Match name formatting of Praesepe Merged
-#     if "_" in item:
-#         item = item.replace("_", " ")
-#         all_exports[j] = item
-#     simbad_row_index_list.append(np.where(simbad["Name"]==item))
-#     pos = simbad_row_index_list[j][0]
-#     j+=1
+#%%% Match name formatting of pm
+j=0
+for item in names:
+    if item.find("_") != -1:
+        item = item.replace("_", " ")
+        names[j] = item
+    j+=1
+
+# Add name column to targets_abr table after sorting alphabetically
+names.sort()
+targets_abr.add_column(names, name="name")
+
+#%%% Get simbad indeces
+j=0
+for star in targets_abr["name"]:
+    # Get simbad index
+    simbad_row_index_list.append(np.where(simbad["Name"]==star))
+    # Next line is necessary because the output style of np.where is horrendous
+    simbad_row_index_list[j] = simbad_row_index_list[j][0][0]
+    j+=1
+
+# Add simbad indeces to targets_abr
+targets_abr.add_column(simbad_row_index_list, name="simbad_index")
+
+# Make sure that stars and simbad indeces are properly paired
+j=0
+for ind in targets_abr["simbad_index"]:
+    star_abr = targets_abr["name"][j]
+    star_simbad = simbad["Name"][ind]
+
+    if star_abr != star_simbad:
+        print(f"ERROR, stars do not match: {star_abr}, {star_simbad}")
+    j+=1
+
+#%%% Get gaia DR2 and 2MASS designations
+j=0
+for ind in targets_abr["simbad_index"]:
+    # Add star designation to appropriate list
+    desig_gaia_dr2_all.append(simbad['GaiaDR2'][ind])
+    desig_2mass_all.append(simbad['2MASS'][ind])
     
-#     # Add star to appropriate list
-#     desig_gaia_dr2_all.append(simbad['GaiaDR2'][j])
-#     desig_2mass_all.append(simbad['2MASS'][j])
+    j+=1
+
+# Add Gaia DR2 and 2MASS designations to targets_abr
+targets_abr.add_column(desig_gaia_dr2_all, name="desig_gaia_dr2")
+targets_abr.add_column(desig_2mass_all, name="desig_2mass")
+
+# Check if Gaia DR2 and 2MASS designations were properly matched with the target star
+j=0
+for ind in targets_abr["simbad_index"]:
+    star_simbad_g = simbad["GaiaDR2"][ind]
+    star_simbad_t = simbad["2MASS"][ind]
+    
+    star_g = targets_abr["desig_gaia_dr2"][j]
+    star_t = targets_abr["desig_2mass"][j]
+
+    if star_g != star_simbad_g:
+        print(f"ERROR, Gaia names do not match: {star_g}, {star_simbad_g}")
+    
+    if star_t != star_simbad_t:
+        print(f"ERROR, 2MASS names do not match: {star_t}, {star_simbad_t}")
+    # else:
+    #     print(f"-------------------------{star_t}")
+    j+=1
+
+#%%% Get pm index list using 2MASS names
+j=0
+for star in targets_abr["desig_2mass"]:
+    pm_index_list.append(np.where(pm["name"]==star))
+    pm_index_list[j] = pm_index_list[j][0][0]
+    
+    j+=1
+
+# Add pm index list to targets_abr
+targets_abr.add_column(pm_index_list, name="pm_index")
+
+# Check if pm index was properly matched to star using 2MASS and Gaia deisgnations
+j=0
+for ind in targets_abr["pm_index"]:
+    star_g = targets_abr["desig_gaia_dr2"][j]
+    star_t = targets_abr["desig_2mass"][j]
+    star_pm_g = pm["DR2_desig"][ind]
+    star_pm_t = pm["name"][ind]
+    # print(star_g, star_pm_g, star_t, star_pm_t, j)
+    if star_g != star_pm_g:
+        print(f"ERROR, Gaia names do not match: {star_g}, {star_pm_g}")
+    
+    if star_t != star_pm_t:
+        print(f"ERROR, 2MASS names do not match: {star_t}, {star_pm_t}")
+    j+=1
+
+targets_abr.write(os.path.join(csv_path_github, "targets_abr2.csv"), overwrite=True)
+
 
 #%%%% Export the list of targets
 # np.savetxt(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/CSV Files/targets_gaia_dr2.csv'), desig_gaia_dr2_all, header="desig_gaia_dr2", fmt='%s', delimiter=',')
@@ -124,14 +207,13 @@ import re
 
 
 
-#%% Get absG mag, absK mag, and BP-RP from praesepe_merged
+#%%% Get absG mag, absK mag, and BP-RP from praesepe_merged
 # csv_path = r"C:\Users\Jared\Documents\GitHub\data-parser\CSV Files"
-# pm = Table.read(os.path.join(csv_path, r'praesepe_merged.csv'))
 # targets_abr = Table.read(os.path.join(csv_path, r'targets_abr.csv'))
-# targets_gaia = os.path.expanduser(os.path.join(csv_path, r'targets_gaia_dr2.csv'))
-# targets_2mass = os.path.expanduser(os.path.join(csv_path, r'targets_2mass.csv'))
 # targets_names = Table.read(os.path.expanduser(os.path.join(csv_path, r'targets_names.csv')))
 
+# targets_gaia = os.path.expanduser(os.path.join(csv_path, r'targets_gaia_dr2.csv'))
+# targets_2mass = os.path.expanduser(os.path.join(csv_path, r'targets_2mass.csv'))
 # table_gaia = Table.read(targets_gaia, names=["Name"], data_start=0)
 # table_2mass = Table.read(targets_2mass, names=["Name"], data_start=0)
 

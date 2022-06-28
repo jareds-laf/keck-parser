@@ -65,20 +65,20 @@ bhac_gaia.remove_rows(np.where(bad_gaia)[0])
 #%% Creating bins by color index
 
 # Setting bins
-color_bin1 = np.trunc(pm['G-K'] / 0.5) 
-color_bin2 = np.trunc(pm['BP-RP'] / 0.5)
+# color_bin1 = np.trunc(pm['G-K'] / 0.5) 
+# color_bin2 = np.trunc(pm['BP-RP'] / 0.5)
 
-pm_grouped_color1 = pm.group_by(color_bin1)
-pm_grouped_color2 = pm.group_by(color_bin2)
+# pm_grouped_color1 = pm.group_by(color_bin1)
+# pm_grouped_color2 = pm.group_by(color_bin2)
 
-pm_binned_color1 = pm_grouped_color1.groups.aggregate(np.mean)
-pm_binned_color2 = pm_grouped_color2.groups.aggregate(np.mean)
+# pm_binned_color1 = pm_grouped_color1.groups.aggregate(np.mean)
+# pm_binned_color2 = pm_grouped_color2.groups.aggregate(np.mean)
 
-# Setting a particular bin to a different color
-low_bin1 = pm['absG'] >= pm_binned_color1['absG'][4]
-high_bin1 = pm['absG'] <= pm_binned_color1['absG'][5]
+# # Setting a particular bin to a different color
+# low_bin1 = pm['absG'] >= pm_binned_color1['absG'][4]
+# high_bin1 = pm['absG'] <= pm_binned_color1['absG'][5]
 
-color_bin1 = low_bin1 & high_bin1
+# color_bin1 = low_bin1 & high_bin1
 
 #%% Plotting G vs. BP-RP
 # fig, ax = plt.subplots()
@@ -118,10 +118,8 @@ y_K = bhac_2mass["M/Ms"]
 calc_mass_2mass = interp1d(x_K, y_K)
 mass_K = calc_mass_2mass(targets['absK'])
 
-targets.add_column(mass_K, name="M/Ms")
-targets.write(os.path.join(csv_path_github, r"targets_abr.csv"), overwrite=True)
-
-# targets_abr.write(os.path.expanduser(os.path.join(csv_path, r"targets_abr.csv")), overwrite=True)
+# targets.add_column(mass_K, name="M/Ms")
+# targets.write(os.path.join(csv_path_github, r"targets_abr.csv"), overwrite=True)
 
 #%%% Plot masses against each other
 # fig2, ax2 = plt.subplots()
@@ -134,23 +132,41 @@ targets.write(os.path.join(csv_path_github, r"targets_abr.csv"), overwrite=True)
 # linear = [0, 0.63]
 # ax2.plot(linear, linear, '-')
 
-fig2, ax2 = plt.subplots()
-plt.title("Masses Using Absolute K Magnitude")
-ax2.set_xlabel('Mass Absolute K Magnitude')
-ax2.set_ylabel('Gaia Data')
-ax2.plot(mass_color, mass_K, '.', label="BP-RP")
-ax2.plot(mass_absmag, mass_K, '.', label="absG")
-linear = [0, 0.65]
-ax2.plot(linear, linear, '-')
-plt.legend()
-plt.show()
-plt.close()
+# fig2, ax2 = plt.subplots()
+# plt.title("Masses Using Absolute K Magnitude")
+# ax2.set_xlabel('Mass Absolute K Magnitude')
+# ax2.set_ylabel('Gaia Data')
+# ax2.plot(mass_color, mass_K, '.', label="BP-RP")
+# ax2.plot(mass_absmag, mass_K, '.', label="absG")
+# linear = [0, 0.65]
+# ax2.plot(linear, linear, '-')
+# plt.legend()
+# plt.show()
+# plt.close()
+
+#%%% Plotting apparentK mag vs. mass to make sure the values are paired with the correct targets
+
+n=0
+for ind in targets["pm_index"]:
+    apparentK = pm["name"][ind]
+    print(apparentK, ind)
+    n+=1
+# print(targets["desig_2mass"])
+# print(pm["name"][91])
+# fig3, ax3 = plt.subplots()
+# plt.title("Masses vs. Apparent K Magnitude")
+# ax3.set_xlabel('Mass Apparent K Magnitude')
+# ax3.set_ylabel('Mass')
+# ax3.plot(mass_color, mass_K, '.', label="BP-RP")
+# ax3.plot(mass_absmag, mass_K, '.', label="absG")
+# linear = [0, 0.65]
+# ax3.plot(linear, linear, '-')
+# plt.legend()
+# plt.show()
+# plt.close()
 
 # From the plot, it is clear that getting mass with absolute G magnitude is more accurate than with BP-RP color index
 # (at least with our sample)
-
-
-
 
 # Writing pm to a .csv file to ensure that I did everything properly
 # pm.write(r'G:/Shared drives/DouglasGroup/Jared Sofair 2022/CSV Files/TestingPM.csv', overwrite = True) # Make sure you close this .csv file before running!
