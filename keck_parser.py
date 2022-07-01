@@ -194,7 +194,7 @@ def export_star(starname): # Export the data to a file that MOLUSC can take. Lot
         kp_mags_psf = get_data_psf(starname)[1:]
         kp_mags_masking = get_data_masking(starname)[1:]
         kp_mags_all = np.concatenate((kp_mags_masking[0 : np.size(kp_mags_masking) - 2], kp_mags_psf))
-        
+
         # Create a table from the data
         data = Table(data = [sep_vals_all, kp_mags_all], names = ["Sep", "Contrast"])
         
@@ -262,6 +262,10 @@ if __name__ == "__main__":
     # masking = get_data_masking("HSHJ300")
     # print(masking)
 
+    # masking = get_data_masking("HIP14807")
+    # print(f"hip masking: {masking}")
+
+
     # print()
 
     # psf = get_data_psf("JS355")
@@ -275,6 +279,9 @@ if __name__ == "__main__":
 
     # psf = get_data_psf("HSHJ300")
     # print(psf)
+
+    # psf = get_data_psf("HIP14807")
+    # print(f"hip psf: {psf}")
 
     # print()
 

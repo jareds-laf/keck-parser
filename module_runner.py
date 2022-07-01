@@ -8,15 +8,10 @@ Created on Fri Jun 24 16:11:19 2022
 from keck_parser import get_data_masking, get_data_psf, plot_star, export_star
 import os
 import numpy as np
-import linecache as lc
-import glob
-from astropy.table import Table, join, Column
-import astropy.io.ascii as at
+from astropy.table import Table
 import matplotlib.pyplot as plt
 import pandas as pd
-import re
 from scipy.interpolate import interp1d
-import matplotlib.pyplot as plt 
 
 #%% Former keck_parser.py actions
 #%%% Plot all targets
@@ -100,6 +95,7 @@ import matplotlib.pyplot as plt
 
 
 #%% Create targets_abr.csv
+# Project to make this faster: use array operations instead of for loops here
 csv_path_github = os.path.expanduser(r"C:/Users/Jared/Documents/GitHub/data-parser/CSV Files")
 csv_path_drive = os.path.expanduser(r"G:/Shared drives/DouglasGroup/Jared Sofair 2022/CSV Files")
 simbad = Table.read(os.path.expanduser(r"G:/Shared drives/DouglasGroup/data/keck_psf_detections_praesepe/Keck_Targets_2018B_Simbad.csv"))
@@ -118,6 +114,8 @@ absK_list = []
 apparentK_list = []
 absG_list = []
 BPminRP_list = []
+ra_list = []
+de_list = []
 targets_abr = Table()
 
 #%%% Match name formatting of pm
@@ -140,6 +138,8 @@ for star in targets_abr["name"]:
     # Next line is necessary because the output style of np.where is horrendous
     simbad_row_index_list[j] = simbad_row_index_list[j][0][0]
     j+=1
+
+
 
 # Add simbad indeces to targets_abr
 targets_abr.add_column(simbad_row_index_list, name="simbad_index")
@@ -265,7 +265,6 @@ calc_mass_2mass = interp1d(x_K, y_K)
 mass_K = calc_mass_2mass(targets_abr["absK"])
 
 targets_abr.add_column(mass_K, name="M/Ms")
-targets_abr.write(os.path.join(csv_path_github, "targets_abr.csv"), overwrite=True)
 
 #%%%% Plotting masses obtained with color and those obtained with absolute magnitude to see which is better
 fig, ax = plt.subplots()
@@ -291,3 +290,68 @@ ax.set_ylabel("Mass")
 ax.plot(apparentK_list, mass_K , '.')
 plt.show()
 plt.close()
+#%%% Get coordinates from Keck Targets
+#08h49m26.76s -- +18d31m19.5s
+# Get ra and dec info
+for j, ind in enumerate(targets_abr["simbad_index"]):
+    # Get ra
+    h = simbad["RAh"][ind]
+    m = simbad["RAm"][ind]
+    s = np.round(simbad["RAs"][ind], 2)
+    ra = f"0{h}h{m}m{s}s"
+    # print(f"{simbad['Name'][ind]}: 0{h}h{m}m{s}s {j}")
+    ra_list.append(ra)
+    
+    # Get dec
+    d = simbad["DEd"][ind]
+    m2 = simbad["DEm"][ind]
+    s2 = np.round(simbad["DEs"][ind], 1)
+    de = f"{d}d{m2}m{s2}s"
+    # print(f"{simbad['Name'][ind]}: {de} {j}")
+    de_list.append(de)
+    
+# print(simbad["RAh"][np.where(targets_abr["name"]==)])
+
+
+# Append ra and de columns to targets_abr
+targets_abr.add_columns([ra_list, de_list], names=["ra", "de"])
+
+# This checking doesn't work, but I can verify that 8=8 is a true statement, as is 21=21. This code thinks they are false.
+# Make sure data pairing was successful
+# for j, ind in enumerate(targets_abr["simbad_index"]):
+#     m1 = targets_abr["ra"][j][1:2]
+#     m2 = targets_abr["de"][j][0:2]
+    
+#     m1_simbad = simbad["RAh"][ind]
+#     m2_simbad = simbad["DEd"][ind]
+    
+#     # print(simbad['Name'][ind], m1, m2, j)
+#     # print(simbad['Name'][ind], m1_simbad, m2_simbad, j)
+#     # print(m1)
+
+     
+#     if m1 != m1_simbad:
+#         print(f"BAD RA {j}")
+#     if m2 != m2_simbad:
+#         print(f"BAD DEC {j}")
+        
+targets_abr.remove_row(np.where(targets_abr["name"]=="HSHJ510")[0][0]) # HSHJ510 is not a member of Praesepe!
+targets_abr.write(os.path.join(csv_path_github, "targets_abr.csv"), overwrite=True)
+
+
+#%% Unsuccessful testing
+# testing = np.where(names==simbad["Name"])
+# RAh = simbad["RAh"][np.where(simbad("Name")==targets_abr("name"))]
+# print(np.where(simbad("Name")==targets_abr("name")))
+# ra_list.append(RAh)
+
+# what do i want to do?
+# search simbad for the target star
+# grab the ra and dec info (3 cols each)
+# put it into a format that batch_creator can read
+
+# targets_abr.remove_row()
+# targets_array = targets_abr.as_array()
+
+
+# For array operations, feeding it the whole column of (for example) simbad indeces will access the simbad data in the same order that you feed in the indeces
