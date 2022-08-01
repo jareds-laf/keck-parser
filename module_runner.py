@@ -12,6 +12,8 @@ from astropy.table import Table
 import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.interpolate import interp1d
+import tkinter
+from tkinter import filedialog
 
 #%% Former keck_parser.py actions
 #%%% Plot all targets
@@ -116,18 +118,25 @@ absG_list = []
 BPminRP_list = []
 ra_list = []
 de_list = []
+testing = []
+ra_j2k_list = []
+de_j2k_list = []
 targets_abr = Table()
+lamost_search = Table()
+
 
 #%%% Match name formatting of pm
-j=0
-for item in names:
+for j, item in enumerate(names):
     if item.find("_") != -1:
         item = item.replace("_", " ")
         names[j] = item
-    j+=1
-
+        
 # Add name column to targets_abr table after sorting alphabetically
 names.sort()
+# print(names)
+
+# testing = np.where(names.find("_") != 1, names = item.replace("_", " "))
+# print(testing.sort())
 targets_abr.add_column(names, name="name")
 
 #%%% Get simbad indeces
@@ -336,10 +345,21 @@ targets_abr.add_columns([ra_list, de_list], names=["ra", "de"])
 #         print(f"BAD DEC {j}")
         
 targets_abr.remove_row(np.where(targets_abr["name"]=="HSHJ510")[0][0]) # HSHJ510 is not a member of Praesepe!
-targets_abr.write(os.path.join(csv_path_github, "targets_abr.csv"), overwrite=True)
+# targets_abr.write(os.path.join(csv_path_github, "targets_abr.csv"), overwrite=True)
 
+#%% Get RA_J2000 and DECJ_2000 for LAMOST searches
 
-#%% Unsuccessful testing
+ra_j2k_list = pm["RA_J2000"][targets_abr["pm_index"]]
+de_j2k_list = pm["DEC_J2000"][targets_abr["pm_index"]]
+lamost_search.add_columns([ra_j2k_list, de_j2k_list], names=["RA_J2000", "DEC_J2000"])
+
+sep_rad = np.full(len(lamost_search), 2.0)
+lamost_search.add_column(sep_rad, name="sep")
+
+lamost_search.write(os.path.join(csv_path_github, "lamost_search.csv"), overwrite=True)
+
+#%% Unsuccessful array operations testing
+
 # testing = np.where(names==simbad["Name"])
 # RAh = simbad["RAh"][np.where(simbad("Name")==targets_abr("name"))]
 # print(np.where(simbad("Name")==targets_abr("name")))
@@ -355,3 +375,7 @@ targets_abr.write(os.path.join(csv_path_github, "targets_abr.csv"), overwrite=Tr
 
 
 # For array operations, feeding it the whole column of (for example) simbad indeces will access the simbad data in the same order that you feed in the indeces
+
+#%% Tinkering with Tkinter to choose files with file explorer
+# tkinter.Tk().withdraw()
+# folder_path = filedialog.askdirectory()
