@@ -30,6 +30,7 @@ try:
             print(f"Plot not generated for {name} (no observation date)")
 except KeyboardInterrupt:
     plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
+    ax.set_facecolor('white')
     ax.set_xlabel("Separation Values (mas)")
     ax.set_ylabel("\u0394 Kp Magnitudes")
     if ax.get_ylim()[0] < ax.get_ylim()[1]:
@@ -40,6 +41,7 @@ except KeyboardInterrupt:
     plt.close("all")
 else:
     plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
+    ax.set_facecolor('white')
     ax.set_xlabel("Separation Values (mas)")
     ax.set_ylabel("\u0394 Kp Magnitudes")
     if ax.get_ylim()[0] < ax.get_ylim()[1]:
@@ -47,7 +49,7 @@ else:
     plt.grid(visible = True)
     ax.set_xscale('log')
     plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.pdf'))
-    plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.png'))
+    plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.png'), dpi=300)
     plt.show()
     plt.close("all")
 
