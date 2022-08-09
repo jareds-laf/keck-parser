@@ -10,6 +10,7 @@ import os
 import numpy as np
 from astropy.table import Table
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import pandas as pd
 from scipy.interpolate import interp1d
 import tkinter
@@ -17,6 +18,11 @@ from tkinter import filedialog
 
 #%% Former keck_parser.py actions
 #%%% Plot all targets
+# Set plot style
+style_path = os.getenv("MPLCONFIGDIR", os.path.expanduser(r"C:\Users\Jared\anaconda3\Lib\site-packages\matplotlib\mpl-data\stylelib")).replace("\\", "/")
+mpl.style.use(os.path.join(style_path, 'bmh.mplstyle').replace("\\", "/"))
+
+
 targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
 try:
     fig, ax = plt.subplots()
@@ -30,7 +36,6 @@ try:
             print(f"Plot not generated for {name} (no observation date)")
 except KeyboardInterrupt:
     plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
-    ax.set_facecolor('white')
     ax.set_xlabel("Separation Values (mas)")
     ax.set_ylabel("\u0394 Kp Magnitudes")
     if ax.get_ylim()[0] < ax.get_ylim()[1]:
@@ -41,7 +46,6 @@ except KeyboardInterrupt:
     plt.close("all")
 else:
     plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
-    ax.set_facecolor('white')
     ax.set_xlabel("Separation Values (mas)")
     ax.set_ylabel("\u0394 Kp Magnitudes")
     if ax.get_ylim()[0] < ax.get_ylim()[1]:
@@ -128,6 +132,7 @@ ra_j2k_list = []
 de_j2k_list = []
 targets_abr = Table()
 lamost_search = Table()
+sdss_search = Table()
 
 
 #%%% Match name formatting of pm
@@ -356,8 +361,6 @@ targets_abr.add_columns([ra_list, de_list], names=["ra", "de"])
 ra_j2k_list = pm["RA_J2000"][targets_abr["pm_index"]]
 de_j2k_list = pm["DEC_J2000"][targets_abr["pm_index"]]
 
-# ra_j2k_list.add_row("blank")
-# de_j2k_list.add_row("blank")
 
 lamost_search.add_columns([ra_j2k_list, de_j2k_list], names=["RA_J2000", "DEC_J2000"])
 # print(lamost_search.columns[:])
@@ -389,7 +392,26 @@ for j, i in enumerate(targets_abr["pm_index"]):
         print(f"ERROR, de_j2ks do not match: {star_de}, {pm_de}")
 
 lamost_search.add_column(names, name="name")
-lamost_search.write(os.path.join(csv_path_github, "lamost_search_names.csv"), overwrite=True)
+# lamost_search.write(os.path.join(csv_path_github, "lamost_search_names.csv"), overwrite=True)
+
+#%% Get RA and DEC for SDSS CrossMatch search
+# ra_j2k_list = pm["RA_J2000"][targets_abr["pm_index"]]
+# de_j2k_list = pm["DEC_J2000"][targets_abr["pm_index"]]
+
+
+# lamost_search.add_columns([ra_j2k_list, de_j2k_list], names=["RA_J2000", "DEC_J2000"])
+# # print(lamost_search.columns[:])
+
+# sep_rad = np.full(len(lamost_search), 2.0)
+# lamost_search.add_column(sep_rad, name="sep")
+# # print(len(sep_rad))
+# # print(len(ra_j2k_list))
+# # print(len(names))
+# # print(len(targets_abr["pm_index"]))
+
+# # lamost_search.show_in_browser()
+# lamost_search.write(os.path.join(csv_path_github, "lamost_search.csv"), overwrite=True)
+# lamost_search.write(os.path.join(csv_path_github, "lamost_search_names.csv"), overwrite=True)
 
 #%% Unsuccessful array operations testing
 

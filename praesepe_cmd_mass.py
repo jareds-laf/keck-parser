@@ -6,9 +6,15 @@ Created on Wed Jun 22 11:36:18 2022
 """
 import os
 import numpy as np
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
+import matplotlib as mpl
 from astropy.table import Table, Column
 from scipy.interpolate import interp1d
+
+# Set mpl style
+style_path = os.getenv("MPLCONFIGDIR", os.path.expanduser(r"C:\Users\Jared\anaconda3\Lib\site-packages\matplotlib\mpl-data\stylelib")).replace("\\", "/")
+mpl.style.use(os.path.join(style_path, 'bmh.mplstyle').replace("\\", "/"))
+
 
 # Read in necessasry csv files
 csv_path_drive = os.path.expanduser(r"G:/Shared drives/DouglasGroup/Jared Sofair 2022/CSV Files")
@@ -78,21 +84,36 @@ bhac_gaia.remove_rows(np.where(bad_gaia)[0])
 
 # color_bin1 = low_bin1 & high_bin1
 
+#%% Creating a bin for our target stars! :D :) :O
+# Setting bins
+# target_bin = targets["BP-RP"]
+
+ # = np.trunc(pm['BP-RP'] / 0.5)
+# pm_binned_color1 = pm_grouped_color1.groups.aggregate(np.mean)
+
+
 #%% Plotting G vs. BP-RP
-# fig, ax = plt.subplots()
-# ax.plot(pm['BP-RP'], pm['absG'], '.', color='#695ffa')
-# # ax.plot(pm['BP-RP'][bad_pm], pm['absG'][bad_pm], 'o', color='red') # Uncomment this and comment line 65 to see removed data
 
-# ax.plot(bhac_gaia['BP-RP'], bhac_gaia['G'], 'o', color='pink')
-# # ax.plot(bhac_gaia['BP-RP'][bad_gaia], bhac_gaia['G'][bad_gaia], 'o', color='red') # Uncomment this and comment line 69 to see removed data
+fig, ax = plt.subplots()
+ax.plot(pm['BP-RP'], pm['absG'], '.', color='#a10f05') # (Almost) all pm stars
+ax.plot(targets['BP-RP'], targets['absG'], "*", color='#F08B00', mec="black", mew="0.25") # All targets
 
+# ax.plot(pm['BP-RP'][bad_pm], pm['absG'][bad_pm], 'o', color='red') # Uncomment this and comment line 65 to see removed data
 
-
-# # ax.plot(pm_binned_color2['BP-RP'], pm_binned_color2['absG'], 'o', color='orange')
-# # ax.plot(pm['BP-RP'][color_bin2], pm['absG'][color_bin2], '.', color='green')
+ax.plot(bhac_gaia['BP-RP'], bhac_gaia['G'], '-', color='#F0A3D3') # BHAC models for main sequence line
+# ax.plot(bhac_gaia['BP-RP'][bad_gaia], bhac_gaia['G'][bad_gaia], 'o', color='red') # Uncomment this and comment line 69 to see removed data
 
 
-# plt.title("G vs. (BP-RP)")
-# ax.set_xlabel('(BP-RP)')
-# ax.set_ylabel('Absolute G Magnitude')
-# ax.invert_yaxis()
+
+# ax.plot(pm_binned_color2['BP-RP'], pm_binned_color2['absG'], 'o', color='orange')
+# ax.plot(pm['BP-RP'][color_bin2], pm['absG'][color_bin2], '.', color='green')
+
+
+plt.title("G vs. (BP-RP)")
+ax.set_xlabel('(BP-RP)')
+ax.set_ylabel('Absolute G Magnitude')
+ax.invert_yaxis()
+
+plt.savefig(os.path.expanduser(r'C:\Users\Jared\Documents\GitHub\data-parser\Plots\G_v_bp_rp_cmd'), bbox_inches='tight', dpi=300)
+plt.show()
+plt.close()
