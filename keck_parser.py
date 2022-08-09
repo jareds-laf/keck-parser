@@ -175,7 +175,7 @@ def plot_star(starname, ax=None): # Plot psf and masking curves for a given star
 
         
         kp_mags_all = np.concatenate((kp_mags_masking[0 : np.size(kp_mags_masking) - 2], kp_mags_psf))
-        plt.step(x=sep_vals_all, y=kp_mags_all, color = "blue", alpha = 0.75)
+        plt.step(x=sep_vals_all, y=kp_mags_all, color = "blue", alpha = 0.50)
 
 def export_star(starname): # Export the data to a file that MOLUSC can take. Lots of overlap with the plot_star function
 
@@ -285,7 +285,7 @@ if __name__ == "__main__":
 
     # print()
 
-    # plot_star("JS355")
+    plot_star("JS355")
     # plot_star("AD_0738")
     # plot_star("EPIC211998192")
     # plot_star("HSHJ300")

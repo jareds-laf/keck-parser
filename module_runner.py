@@ -17,37 +17,39 @@ from tkinter import filedialog
 
 #%% Former keck_parser.py actions
 #%%% Plot all targets
-# targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
-# try:
-#     fig, ax = plt.subplots()
-#     for name, obsdate in targets.iterrows():
-#         print("Name:", name, "Obsdate:", obsdate[14])
-#         if not pd.isnull(obsdate[14]):
-#             star = name.replace(" ", "_")
-#             # print(star)
-#             plot_star(star, ax)
-#         else:
-#             print(f"Plot not generated for {name} (no observation date)")
-# except KeyboardInterrupt:
-#     plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
-#     ax.set_xlabel("Separation Values (mas)")
-#     ax.set_ylabel("\u0394 Kp Magnitudes")
-#     if ax.get_ylim()[0] < ax.get_ylim()[1]:
-#         ax.invert_yaxis()
-#     plt.grid(visible = True)
-#     plt.show()
-#     plt.close("all")
-# else:
-#     plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
-#     ax.set_xlabel("Separation Values (mas)")
-#     ax.set_ylabel("\u0394 Kp Magnitudes")
-#     if ax.get_ylim()[0] < ax.get_ylim()[1]:
-#         ax.invert_yaxis()
-#     plt.grid(visible = True)
-#     plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.pdf'))
-#     plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.png'))
-#     plt.show()
-#     plt.close("all")
+targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
+try:
+    fig, ax = plt.subplots()
+    for name, obsdate in targets.iterrows():
+        print("Name:", name, "Obsdate:", obsdate[14])
+        if not pd.isnull(obsdate[14]):
+            star = name.replace(" ", "_")
+            # print(star)
+            plot_star(star, ax)
+        else:
+            print(f"Plot not generated for {name} (no observation date)")
+except KeyboardInterrupt:
+    plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
+    ax.set_xlabel("Separation Values (mas)")
+    ax.set_ylabel("\u0394 Kp Magnitudes")
+    if ax.get_ylim()[0] < ax.get_ylim()[1]:
+        ax.invert_yaxis()
+    plt.grid(visible = True)
+    ax.set_xscale('log')
+    plt.show()
+    plt.close("all")
+else:
+    plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
+    ax.set_xlabel("Separation Values (mas)")
+    ax.set_ylabel("\u0394 Kp Magnitudes")
+    if ax.get_ylim()[0] < ax.get_ylim()[1]:
+        ax.invert_yaxis()
+    plt.grid(visible = True)
+    ax.set_xscale('log')
+    plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.pdf'))
+    plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.png'))
+    plt.show()
+    plt.close("all")
 
 # print(get_data_masking("JS355"))
 
@@ -106,7 +108,8 @@ bhac_2mass = Table.read(os.path.join(csv_path_drive, r"BHAC Tables/BHAC_2MASS.cs
 
 pm = Table.read(os.path.join(csv_path_github, r'praesepe_merged.csv'))
 
-names = ['AD_1427', 'AD_2354', 'AD_2595', 'AD_3663', 'EPIC211885995', 'HSHJ510', 'JS117', 'JS169', 'JS178', 'JS181', 'JS191', 'JS301', 'JS317', 'JS318', 'JS352', 'JS355', 'JS373', 'JS394', 'JS405', 'JS432', 'JS513', 'JS533', 'JS545', 'JS552', 'JS582', 'JS620', 'JS649', 'KW569', 'AD_0738', 'AD_3411', 'JS_46', 'JS113', 'JS230', 'JS364', 'JS430', 'JS452', 'KW564', 'AD_1660', 'EPIC211998192', 'EPIC212011416', 'EPIC212127087', 'HSHJ300', 'JS119', 'JS148', 'JS174', 'JS187', 'JS200', 'JS232', 'JS246', 'JS415', 'JS468', 'JS488', 'JS505', 'JS541', 'JS550', 'JS689']
+# HSHJ510 removed since it is not a member of Praesepe
+names = ['AD_1427', 'AD_2354', 'AD_2595', 'AD_3663', 'EPIC211885995', 'JS117', 'JS169', 'JS178', 'JS181', 'JS191', 'JS301', 'JS317', 'JS318', 'JS352', 'JS355', 'JS373', 'JS394', 'JS405', 'JS432', 'JS513', 'JS533', 'JS545', 'JS552', 'JS582', 'JS620', 'JS649', 'KW569', 'AD_0738', 'AD_3411', 'JS_46', 'JS113', 'JS230', 'JS364', 'JS430', 'JS452', 'KW564', 'AD_1660', 'EPIC211998192', 'EPIC212011416', 'EPIC212127087', 'HSHJ300', 'JS119', 'JS148', 'JS174', 'JS187', 'JS200', 'JS232', 'JS246', 'JS415', 'JS468', 'JS488', 'JS505', 'JS541', 'JS550', 'JS689']
 
 desig_gaia_dr2_all = []
 desig_2mass_all = []
@@ -127,13 +130,13 @@ lamost_search = Table()
 
 #%%% Match name formatting of pm
 for j, item in enumerate(names):
-    if item.find("_") != -1:
-        item = item.replace("_", " ")
-        names[j] = item
+        if item.find("_") != -1:
+            item = item.replace("_", " ")
+            names[j] = item
+
         
 # Add name column to targets_abr table after sorting alphabetically
 names.sort()
-# print(names)
 
 # testing = np.where(names.find("_") != 1, names = item.replace("_", " "))
 # print(testing.sort())
@@ -276,29 +279,29 @@ mass_K = calc_mass_2mass(targets_abr["absK"])
 targets_abr.add_column(mass_K, name="M/Ms")
 
 #%%%% Plotting masses obtained with color and those obtained with absolute magnitude to see which is better
-fig, ax = plt.subplots()
-plt.title("Masses Using Absolute K Magnitude")
-ax.set_xlabel('Mass Absolute K Magnitude')
-ax.set_ylabel('Gaia Data')
-ax.plot(mass_color, mass_K, '.', label="BP-RP")
-ax.plot(mass_absmag, mass_K, '.', label="absG")
-linear = [0, 0.65]
-ax.plot(linear, linear, '-')
-plt.legend()
-plt.show()
-plt.close()
+# fig, ax = plt.subplots()
+# plt.title("Masses Using Absolute K Magnitude")
+# ax.set_xlabel('Mass Absolute K Magnitude')
+# ax.set_ylabel('Gaia Data')
+# ax.plot(mass_color, mass_K, '.', label="BP-RP")
+# ax.plot(mass_absmag, mass_K, '.', label="absG")
+# linear = [0, 0.65]
+# ax.plot(linear, linear, '-')
+# plt.legend()
+# plt.show()
+# plt.close()
 
 # From the plot, it is clear that getting mass with absolute G magnitude is more accurate than with BP-RP color index
 # (at least with our sample)
 
 #%%%% Plotting apparentK mag vs. mass to make sure the values are paired with the correct targets
-fig, ax = plt.subplots()
-plt.title("Mass vs. Apparent K Magnitude")
-ax.set_xlabel("Apparent K Magnitude")
-ax.set_ylabel("Mass")
-ax.plot(apparentK_list, mass_K , '.')
-plt.show()
-plt.close()
+# fig, ax = plt.subplots()
+# plt.title("Mass vs. Apparent K Magnitude")
+# ax.set_xlabel("Apparent K Magnitude")
+# ax.set_ylabel("Mass")
+# ax.plot(apparentK_list, mass_K , '.')
+# plt.show()
+# plt.close()
 #%%% Get coordinates from Keck Targets
 #08h49m26.76s -- +18d31m19.5s
 # Get ra and dec info
@@ -344,19 +347,47 @@ targets_abr.add_columns([ra_list, de_list], names=["ra", "de"])
 #     if m2 != m2_simbad:
 #         print(f"BAD DEC {j}")
         
-targets_abr.remove_row(np.where(targets_abr["name"]=="HSHJ510")[0][0]) # HSHJ510 is not a member of Praesepe!
 # targets_abr.write(os.path.join(csv_path_github, "targets_abr.csv"), overwrite=True)
 
 #%% Get RA_J2000 and DECJ_2000 for LAMOST searches
 
 ra_j2k_list = pm["RA_J2000"][targets_abr["pm_index"]]
 de_j2k_list = pm["DEC_J2000"][targets_abr["pm_index"]]
+
+# ra_j2k_list.add_row("blank")
+# de_j2k_list.add_row("blank")
+
 lamost_search.add_columns([ra_j2k_list, de_j2k_list], names=["RA_J2000", "DEC_J2000"])
+# print(lamost_search.columns[:])
 
 sep_rad = np.full(len(lamost_search), 2.0)
 lamost_search.add_column(sep_rad, name="sep")
+# print(len(sep_rad))
+# print(len(ra_j2k_list))
+# print(len(names))
+# print(len(targets_abr["pm_index"]))
 
+# lamost_search.show_in_browser()
 lamost_search.write(os.path.join(csv_path_github, "lamost_search.csv"), overwrite=True)
+
+
+# Check if ra_j2k and dec_j2k were properly assigned to each target
+for j, i in enumerate(targets_abr["pm_index"]):
+    # print(i, j)
+    star_ra = lamost_search["RA_J2000"][j]
+    pm_ra = pm["RA_J2000"][i]
+    
+    star_de = lamost_search["DEC_J2000"][j]
+    pm_de = pm["DEC_J2000"][i]
+    
+    if star_ra != pm_ra:
+        print(f"ERROR, ra_j2ks do not match: {star_ra}, {pm_ra}")
+    
+    if star_de != pm_de:
+        print(f"ERROR, de_j2ks do not match: {star_de}, {pm_de}")
+
+lamost_search.add_column(names, name="name")
+lamost_search.write(os.path.join(csv_path_github, "lamost_search_names.csv"), overwrite=True)
 
 #%% Unsuccessful array operations testing
 
