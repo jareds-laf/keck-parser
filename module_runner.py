@@ -19,43 +19,43 @@ from tkinter import filedialog
 #%% Former keck_parser.py actions
 #%%% Plot all targets
 # Set plot style
-style_path = os.getenv("MPLCONFIGDIR", os.path.expanduser(r"C:\Users\Jared\anaconda3\Lib\site-packages\matplotlib\mpl-data\stylelib")).replace("\\", "/")
-mpl.style.use(os.path.join(style_path, 'bmh.mplstyle').replace("\\", "/"))
+# style_path = os.getenv("MPLCONFIGDIR", os.path.expanduser(r"C:\Users\Jared\anaconda3\Lib\site-packages\matplotlib\mpl-data\stylelib")).replace("\\", "/")
+# mpl.style.use(os.path.join(style_path, 'bmh.mplstyle').replace("\\", "/"))
 
 
-targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
-try:
-    fig, ax = plt.subplots()
-    for name, obsdate in targets.iterrows():
-        print("Name:", name, "Obsdate:", obsdate[14])
-        if not pd.isnull(obsdate[14]):
-            star = name.replace(" ", "_")
-            # print(star)
-            plot_star(star, ax)
-        else:
-            print(f"Plot not generated for {name} (no observation date)")
-except KeyboardInterrupt:
-    plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
-    ax.set_xlabel("Separation Values (mas)")
-    ax.set_ylabel("\u0394 Kp Magnitudes")
-    if ax.get_ylim()[0] < ax.get_ylim()[1]:
-        ax.invert_yaxis()
-    plt.grid(visible = True)
-    ax.set_xscale('log')
-    plt.show()
-    plt.close("all")
-else:
-    plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
-    ax.set_xlabel("Separation Values (mas)")
-    ax.set_ylabel("\u0394 Kp Magnitudes")
-    if ax.get_ylim()[0] < ax.get_ylim()[1]:
-        ax.invert_yaxis()
-    plt.grid(visible = True)
-    ax.set_xscale('log')
-    plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.pdf'))
-    plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.png'), dpi=300)
-    plt.show()
-    plt.close("all")
+# targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
+# try:
+#     fig, ax = plt.subplots()
+#     for name, obsdate in targets.iterrows():
+#         print("Name:", name, "Obsdate:", obsdate[14])
+#         if not pd.isnull(obsdate[14]):
+#             star = name.replace(" ", "_")
+#             # print(star)
+#             plot_star(star, ax)
+#         else:
+#             print(f"Plot not generated for {name} (no observation date)")
+# except KeyboardInterrupt:
+#     plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
+#     ax.set_xlabel("Separation Values (mas)")
+#     ax.set_ylabel("\u0394 Kp Magnitudes")
+#     if ax.get_ylim()[0] < ax.get_ylim()[1]:
+#         ax.invert_yaxis()
+#     plt.grid(visible = True)
+#     ax.set_xscale('log')
+#     plt.show()
+#     plt.close("all")
+# else:
+#     plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
+#     ax.set_xlabel("Separation Values (mas)")
+#     ax.set_ylabel("\u0394 Kp Magnitudes")
+#     if ax.get_ylim()[0] < ax.get_ylim()[1]:
+#         ax.invert_yaxis()
+#     plt.grid(visible = True)
+#     ax.set_xscale('log')
+#     plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.pdf'))
+#     plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.png'), dpi=300)
+#     plt.show()
+#     plt.close("all")
 
 # print(get_data_masking("JS355"))
 
@@ -367,10 +367,6 @@ lamost_search.add_columns([ra_j2k_list, de_j2k_list], names=["RA_J2000", "DEC_J2
 
 sep_rad = np.full(len(lamost_search), 2.0)
 lamost_search.add_column(sep_rad, name="sep")
-# print(len(sep_rad))
-# print(len(ra_j2k_list))
-# print(len(names))
-# print(len(targets_abr["pm_index"]))
 
 # lamost_search.show_in_browser()
 lamost_search.write(os.path.join(csv_path_github, "lamost_search.csv"), overwrite=True)
@@ -398,20 +394,13 @@ lamost_search.add_column(names, name="name")
 # ra_j2k_list = pm["RA_J2000"][targets_abr["pm_index"]]
 # de_j2k_list = pm["DEC_J2000"][targets_abr["pm_index"]]
 
+sdss_search.add_columns([names, ra_j2k_list, de_j2k_list], names=["name", "ra", "dec"])
+# print(lamost_search.columns[:])
+# print(len(sdss_search))
+sdss_search.write(os.path.join(csv_path_github, "sdss_search.txt"), format = 'ascii.basic', delimiter = ' ', overwrite=True)
 
-# lamost_search.add_columns([ra_j2k_list, de_j2k_list], names=["RA_J2000", "DEC_J2000"])
-# # print(lamost_search.columns[:])
-
-# sep_rad = np.full(len(lamost_search), 2.0)
-# lamost_search.add_column(sep_rad, name="sep")
-# # print(len(sep_rad))
-# # print(len(ra_j2k_list))
-# # print(len(names))
-# # print(len(targets_abr["pm_index"]))
-
-# # lamost_search.show_in_browser()
-# lamost_search.write(os.path.join(csv_path_github, "lamost_search.csv"), overwrite=True)
-# lamost_search.write(os.path.join(csv_path_github, "lamost_search_names.csv"), overwrite=True)
+# sdss_search.show_in_browser()
+# sdss_search.write(os.path.join(csv_path_github, "sdss_search.txt"), overwrite=True)
 
 #%% Unsuccessful array operations testing
 
