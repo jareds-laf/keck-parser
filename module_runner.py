@@ -150,16 +150,23 @@ names.sort()
 targets_abr.add_column(names, name="name")
 
 #%%% Get simbad indeces
-j=0
-for star in targets_abr["name"]:
+for j, star in enumerate(targets_abr["name"]):
     # Get simbad index
     simbad_row_index_list.append(np.where(simbad["Name"]==star))
     # Next line is necessary because the output style of np.where is horrendous
     simbad_row_index_list[j] = simbad_row_index_list[j][0][0]
-    j+=1
 
+simmy = []
+a = np.arange(10)
+b = np.arange(5,17)
+print(a, b, len(a), len(b))
+# print(a==b)
+# print(np.any(a==b))
+print(len(simbad["Name"]), len(targets_abr["name"]))
+# simmy = simbad["Name"]==targets_abr["name"]
 
-
+# simmy.append(np.any(np.where(simbad["Name"]==targets_abr["name"])))
+print(simmy, len(simmy))
 # Add simbad indeces to targets_abr
 targets_abr.add_column(simbad_row_index_list, name="simbad_index")
 

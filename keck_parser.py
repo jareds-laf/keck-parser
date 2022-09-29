@@ -14,6 +14,70 @@ import astropy.io.ascii as at
 import matplotlib.pyplot as plt
 import pandas as pd
 import re
+import mmap
+
+csv_path_github = os.path.expanduser(r"C:/Users/Jared/Documents/GitHub/data-parser/CSV Files")
+
+def masking_binary(starname):
+    # Get file
+    keck_masking_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/data/keck_masking_detections_praesepe/*')
+
+    filelist = glob.glob(os.path.join(keck_masking_dir, f"{starname}*"))
+
+     # Proper operation! Only one entry found in masking data :)
+    if len(filelist) == 1:
+        filename = filelist[0]
+     # If no star with the input name is found
+    elif len(filelist) == 0: 
+        print(f"No masking data detected for {starname}.")
+        return None
+     # If there is more than one star with the input name
+    elif len(filelist) > 1:
+        print(f"Easton, we have a problem! Multiple masking entries detected for {starname} :(")
+        print(filelist)
+        return None
+    
+    with open(filename, 'rb', 0) as file:
+        # TODO: Get the length of the file - maybe can use mmap features to make more efficient?
+        length = len(file.readlines())
+
+        # Open the file as a memory mapped file for efficiency
+        f = mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ)
+        if f.find(b'Significance') != -1:
+            # Get line number of the Significance
+            sig_ind = f.find(b'Significance')
+            
+            # TODO: Seek to and get Significance value [WIP]
+            f.seek(sig_ind)
+            print(f.readline())
+            # print(s[sig_ind:sig_ind+30].decode('utf-8'))
+            # print('Significance data found!')
+
+# with open(STAT_FILE, "r+b") as f:
+#     map_file = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
+#     for line in iter(map_file.readline, b""):
+        # whatever
+
+
+    # Turn the data into an array
+    # try:
+    #     # raw_data = lc.getline(filename)
+    #     print(raw_data)
+    #     data_as_string = raw_data[raw_data.find(r'Significance') : raw_data.find(r')')]
+    #     data_as_arr = data_as_string.split('&')
+    #     data = np.asarray(data_as_arr, dtype="float")
+    #     print(data)
+    # except ValueError:
+    #     print(f"No significance was found for the star {starname}.")
+    #     return None
+
+    # Create the table from the data
+    # names_col_masking = ["Epoch", "15", "30", "60", "120", "200", "280"] # Column names for data from keck_masking_detections_praesepe ICE
+    
+    # sep_vals = np.asarray(t_masking.colnames[1:],dtype="float") (have here ICE)
+    # kp_mags_masking = data[1:]
+    return
+    # return data
 
 def get_data_masking(starname): # Get kp mags for a given star (masking dataset)
     
@@ -285,7 +349,7 @@ if __name__ == "__main__":
 
     # print()
 
-    plot_star("JS355")
+    # plot_star("JS355")
     # plot_star("AD_0738")
     # plot_star("EPIC211998192")
     # plot_star("HSHJ300")
@@ -296,6 +360,18 @@ if __name__ == "__main__":
     # print(export)
 
     # print()
+    
+    # masking_binary("JS230")
+    masking_binary("AD_3663")
+    targets_abr = Table.read(os.path.join(csv_path_github, r'targets_abr.csv'))
+    # for name in targets_abr.iterrows('name'):
+    #     masking_binary(name[0])
+        #print(name[0])
+
+    
+    
+    # print(targets_abr)
+
  
 #%% To do:
 # Output data with J filter as well
