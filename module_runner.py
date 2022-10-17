@@ -19,43 +19,43 @@ from tkinter import filedialog
 #%% Former keck_parser.py actions
 #%%% Plot all targets
 # Set plot style
-# style_path = os.getenv("MPLCONFIGDIR", os.path.expanduser(r"C:\Users\Jared\anaconda3\Lib\site-packages\matplotlib\mpl-data\stylelib")).replace("\\", "/")
-# mpl.style.use(os.path.join(style_path, 'bmh.mplstyle').replace("\\", "/"))
+style_path = os.getenv("MPLCONFIGDIR", os.path.expanduser(r"C:\Users\Jared\anaconda3\Lib\site-packages\matplotlib\mpl-data\stylelib")).replace("\\", "/")
+mpl.style.use(os.path.join(style_path, 'bmh.mplstyle').replace("\\", "/"))
 
 
-# targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
-# try:
-#     fig, ax = plt.subplots()
-#     for name, obsdate in targets.iterrows():
-#         print("Name:", name, "Obsdate:", obsdate[14])
-#         if not pd.isnull(obsdate[14]):
-#             star = name.replace(" ", "_")
-#             # print(star)
-#             plot_star(star, ax)
-#         else:
-#             print(f"Plot not generated for {name} (no observation date)")
-# except KeyboardInterrupt:
-#     plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
-#     ax.set_xlabel("Separation Values (mas)")
-#     ax.set_ylabel("\u0394 Kp Magnitudes")
-#     if ax.get_ylim()[0] < ax.get_ylim()[1]:
-#         ax.invert_yaxis()
-#     plt.grid(visible = True)
-#     ax.set_xscale('log')
-#     plt.show()
-#     plt.close("all")
-# else:
-#     plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
-#     ax.set_xlabel("Separation Values (mas)")
-#     ax.set_ylabel("\u0394 Kp Magnitudes")
-#     if ax.get_ylim()[0] < ax.get_ylim()[1]:
-#         ax.invert_yaxis()
-#     plt.grid(visible = True)
-#     ax.set_xscale('log')
-#     plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.pdf'))
-#     plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.png'), dpi=300)
-#     plt.show()
-#     plt.close("all")
+targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
+try:
+    fig, ax = plt.subplots()
+    for name, obsdate in targets.iterrows():
+        print("Name:", name, "Obsdate:", obsdate[14])
+        if not pd.isnull(obsdate[14]):
+            star = name.replace(" ", "_")
+            # print(star)
+            plot_star(star, ax)
+        else:
+            print(f"Plot not generated for {name} (no observation date)")
+except KeyboardInterrupt:
+    plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
+    ax.set_xlabel("Separation Values (mas)")
+    ax.set_ylabel("\u0394 Kp Magnitudes")
+    if ax.get_ylim()[0] < ax.get_ylim()[1]:
+        ax.invert_yaxis()
+    plt.grid(visible = True)
+    ax.set_xscale('log')
+    plt.show()
+    plt.close("all")
+else:
+    plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
+    ax.set_xlabel("Separation Values (mas)")
+    ax.set_ylabel("\u0394 Kp Magnitudes")
+    if ax.get_ylim()[0] < ax.get_ylim()[1]:
+        ax.invert_yaxis()
+    plt.grid(visible = True)
+    ax.set_xscale('log')
+    # plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.pdf'))
+    # plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.png'), dpi=300)
+    plt.show()
+    plt.close("all")
 
 # print(get_data_masking("JS355"))
 

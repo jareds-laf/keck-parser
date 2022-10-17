@@ -18,7 +18,14 @@ import mmap
 
 csv_path_github = os.path.expanduser(r"C:/Users/Jared/Documents/GitHub/data-parser/CSV Files")
 
+# Is a given target a binary based on the masking data results?
 def masking_binary(starname):
+    if " " in f"{starname}":
+        starname = starname.replace(" ", "_")
+    #     print(starname)
+    # else:
+    #     print(starname)
+    
     # Get file
     keck_masking_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/data/keck_masking_detections_praesepe/*')
 
@@ -38,8 +45,9 @@ def masking_binary(starname):
         return None
     
     with open(filename, 'rb', 0) as file:
+        # I actually don't know if I need to do vvv
         # TODO: Get the length of the file - maybe can use mmap features to make more efficient?
-        length = len(file.readlines())
+        # length = len(file.readlines())
 
         # Open the file as a memory mapped file for efficiency
         f = mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ)
@@ -49,9 +57,16 @@ def masking_binary(starname):
             
             # TODO: Seek to and get Significance value [WIP]
             f.seek(sig_ind)
-            print(f.readline())
-            # print(s[sig_ind:sig_ind+30].decode('utf-8'))
-            # print('Significance data found!')
+            sig_line = f.readline().decode('utf-8').replace(' ', '')
+            
+            # Significance value happens after the : and ends before the =
+            a = sig_line.index(':')+1
+            b = sig_line.index('=')
+            sig = sig_line[a:b]
+            if float(sig) > 10:
+                print(f"{starname}: {sig}")
+        # else:
+        #     print("No significance data found!")
 
 # with open(STAT_FILE, "r+b") as f:
 #     map_file = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
@@ -80,7 +95,9 @@ def masking_binary(starname):
     # return data
 
 def get_data_masking(starname): # Get kp mags for a given star (masking dataset)
-    
+    if " " in f"{starname}":
+        starname = starname.replace(" ", "_")
+        
     # Get file
     keck_masking_dir = os.path.expanduser(r'G:/Shared drives/DouglasGroup/data/keck_masking_detections_praesepe/*')
 
@@ -362,12 +379,14 @@ if __name__ == "__main__":
     # print()
     
     # masking_binary("JS230")
-    masking_binary("AD_3663")
+    # masking_binary("AD_3663")
+        
     targets_abr = Table.read(os.path.join(csv_path_github, r'targets_abr.csv'))
-    # for name in targets_abr.iterrows('name'):
-    #     masking_binary(name[0])
-        #print(name[0])
-
+    for name in targets_abr.iterrows('name'):
+        # get_data_masking(name[0])
+        # plot_star(name[0])
+        masking_binary(name[0])
+        # print(name[0])
     
     
     # print(targets_abr)
