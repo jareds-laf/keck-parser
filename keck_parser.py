@@ -17,6 +17,7 @@ import re
 import mmap
 
 csv_path_github = os.path.expanduser(r"C:/Users/Jared/Documents/GitHub/data-parser/CSV Files")
+csv_path_drive = os.path.expanduser(r"G:/Shared drives/DouglasGroup/data/WIYN")
 
 # Is a given target a binary based on the masking data results?
 def masking_binary(starname):
@@ -36,7 +37,7 @@ def masking_binary(starname):
         filename = filelist[0]
      # If no star with the input name is found
     elif len(filelist) == 0: 
-        print(f"No masking data detected for {starname}.")
+        # print(f"No masking data detected for {starname}.")
         return None
      # If there is more than one star with the input name
     elif len(filelist) > 1:
@@ -49,7 +50,7 @@ def masking_binary(starname):
         # TODO: Get the length of the file - maybe can use mmap features to make more efficient?
         # length = len(file.readlines())
 
-        # Open the file as a memory mapped file for efficiency
+        # Open the file as a memory mapped file (for efficiency)
         f = mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ)
         if f.find(b'Significance') != -1:
             # Get line number of the Significance
@@ -106,7 +107,7 @@ def get_data_masking(starname): # Get kp mags for a given star (masking dataset)
     if len(filelist) == 1: # Proper operation! Only one entry found in masking data :)
         filename = filelist[0]
     elif len(filelist) == 0: # If no star with the input name is found
-        print(f"No masking data detected for {starname}.")
+        # print(f"No masking data detected for {starname}.")
         return None
     elif len(filelist) > 1: # If there is more than one star with the input name
         print(f"Easton, we have a problem! Multiple masking entries detected for {starname} :(")
@@ -381,16 +382,35 @@ if __name__ == "__main__":
     # masking_binary("JS230")
     # masking_binary("AD_3663")
         
-    targets_abr = Table.read(os.path.join(csv_path_github, r'targets_abr.csv'))
-    for name in targets_abr.iterrows('name'):
-        # get_data_masking(name[0])
-        # plot_star(name[0])
-        masking_binary(name[0])
+    # Get a list of confirmed binaries from masking data
+    # targets_abr = Table.read(os.path.join(csv_path_github, r'targets_abr.csv'))
+    # for name in targets_abr.iterrows('name'):
+    #     # get_data_masking(name[0])
+    #     # plot_star(name[0])
+    #     masking_binary(name[0])
         # print(name[0])
     
     
     # print(targets_abr)
+    
 
+    # Get a list of targets we have RVs for (they come up multiple times in WIYN_RVs_matchedKeck.csv)
+    targets_abr = Table.read(os.path.join(csv_path_github, r'targets_abr.csv'))
+    wiyn = Table.read(os.path.join(csv_path_drive, r'WIYN_RVs_matchedKeck.csv'))
+    targets_wiyn = wiyn['Name']
+    
+    # List of all targets which appear multiple times in wiyn
+    targets_rv = np.array([])
+    
+    for i, name in enumerate(targets_abr.iterrows('name')):
+        # Count the number of times a target appears in wiyn
+        count = np.count_nonzero(targets_wiyn == targets_abr['name'][i])
+        
+        # If it is in wiyn multiple times, put it in targets_rv
+        if count > 1:
+            targets_rv = np.append(targets_rv, name[0])
+            
+    print(targets_rv)
  
 #%% To do:
 # Output data with J filter as well
