@@ -18,6 +18,39 @@ import mmap
 
 csv_path_github = os.path.expanduser(r"C:/Users/Jared/Documents/GitHub/data-parser/CSV Files")
 csv_path_drive = os.path.expanduser(r"G:/Shared drives/DouglasGroup/data/WIYN")
+rv_output_path = os.path.expanduser(r"G:/Shared drives/DouglasGroup/Jared Sofair 2022/MOLUSC/Data Parser tables/MOLUSC RVs")
+
+targets_abr = Table.read(os.path.join(csv_path_github, r'targets_abr.csv'))
+wiyn = Table.read(os.path.join(csv_path_drive, r'WIYN_RVs_matchedKeck.csv'))
+targets_wiyn = wiyn['Name']  
+
+# Get RV, RVerr, and HJD for each target that we have multiple RVs for
+def output_rv_data(starname):
+    # Row indeces where the target shows up in wiyn
+    target_indeces = np.where(targets_wiyn == starname)[0]
+    # print(targets_wiyn[np.where(targets_wiyn == starname)])
+
+    # Grab RV, RVerr, and HJD at each index
+    rv = np.array([])
+    rverr = np.array([])
+    jd = np.array([])
+    
+    for i in target_indeces:
+        rv = np.append(rv, wiyn["rv"][i])
+        rverr = np.append(rverr, wiyn["err"][i])
+        
+        # Also converts HJD to JD using MJD to JD conversion (since we don't need to be too precise :))
+        jd = np.append(jd, wiyn["hjd"][i]+2400000.5)
+    
+    # print(rv)
+    # print(rverr)
+    # print(jd)
+    
+    # Export rv data into a text file that MOLUSC can read!
+    if starname.find("_") != -1:
+        starname = starname.replace(" ", "_")
+    rv_data = Table(data = [jd, rv, rverr], names = ["JD", "RV", "RVerr"])
+    rv_data.write(os.path.join(rv_output_path, f"{starname}.txt"), format = 'ascii.basic', delimiter = ' ', overwrite=True)
 
 # Is a given target a binary based on the masking data results?
 def masking_binary(starname):
@@ -394,10 +427,7 @@ if __name__ == "__main__":
     # print(targets_abr)
     
 
-    # Get a list of targets we have RVs for (they come up multiple times in WIYN_RVs_matchedKeck.csv)
-    targets_abr = Table.read(os.path.join(csv_path_github, r'targets_abr.csv'))
-    wiyn = Table.read(os.path.join(csv_path_drive, r'WIYN_RVs_matchedKeck.csv'))
-    targets_wiyn = wiyn['Name']
+#%% Get a list of targets we have RVs for (they come up multiple times in WIYN_RVs_matchedKeck.csv)
     
     # List of all targets which appear multiple times in wiyn
     targets_rv = np.array([])
@@ -405,12 +435,19 @@ if __name__ == "__main__":
     for i, name in enumerate(targets_abr.iterrows('name')):
         # Count the number of times a target appears in wiyn
         count = np.count_nonzero(targets_wiyn == targets_abr['name'][i])
+        # print(f"{name[0]}: {count}")
         
         # If it is in wiyn multiple times, put it in targets_rv
         if count > 1:
             targets_rv = np.append(targets_rv, name[0])
             
-    print(targets_rv)
- 
+    # print(targets_rv)
+#%% Use the list of targets we have RVs for to generate files that we can feed MOLUSC
+for name in targets_rv:
+    output_rv_data(name)
+    
+#%% TODO: Take targets_abr and add rv, rverr, hjd (converted to mjd) and output them to txt file readable by MOLUSC
+
+        
 #%% To do:
 # Output data with J filter as well
