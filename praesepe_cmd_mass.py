@@ -69,43 +69,46 @@ bhac_gaia.remove_rows(np.where(bad_gaia)[0])
 #%% Creating bins by color index
 
 # Setting bins
-# color_bin1 = np.trunc(pm['G-K'] / 0.5) 
-# color_bin2 = np.trunc(pm['BP-RP'] / 0.5)
+color_bin1 = np.trunc(pm['G-K'] / 0.5) 
+color_bin2 = np.trunc(pm['BP-RP'] / 0.5)
 
-# pm_grouped_color1 = pm.group_by(color_bin1)
-# pm_grouped_color2 = pm.group_by(color_bin2)
+pm_grouped_color1 = pm.group_by(color_bin1)
+pm_grouped_color2 = pm.group_by(color_bin2)
 
-# pm_binned_color1 = pm_grouped_color1.groups.aggregate(np.mean)
-# pm_binned_color2 = pm_grouped_color2.groups.aggregate(np.mean)
+pm_binned_color1 = pm_grouped_color1.groups.aggregate(np.mean)
+pm_binned_color2 = pm_grouped_color2.groups.aggregate(np.mean)
 
-# # Setting a particular bin to a different color
-# low_bin1 = pm['absG'] >= pm_binned_color1['absG'][4]
-# high_bin1 = pm['absG'] <= pm_binned_color1['absG'][5]
+# Setting a particular bin to a different color
+low_bin1 = pm['absG'] >= pm_binned_color1['absG'][4]
+high_bin1 = pm['absG'] <= pm_binned_color1['absG'][5]
 
-# color_bin1 = low_bin1 & high_bin1
+color_bin1 = low_bin1 & high_bin1
 
 #%% Creating a bin for our target stars! :D :) :O
 # Setting bins
-# target_bin = targets["BP-RP"]
+target_bin = targets["BP-RP"]
 
- # = np.trunc(pm['BP-RP'] / 0.5)
-# pm_binned_color1 = pm_grouped_color1.groups.aggregate(np.mean)
+  # = np.trunc(pm['BP-RP'] / 0.5)
+pm_binned_color1 = pm_grouped_color1.groups.aggregate(np.mean)
 
 
 #%% Plotting G vs. BP-RP
 
 fig, ax = plt.subplots()
 ax.plot(pm['BP-RP'], pm['absG'], '.', color='#a10f05') # (Almost) all pm stars
-ax.plot(targets['BP-RP'], targets['absG'], "*", color='#F08B00', mec="black", mew="0.25") # All targets
+ax.plot(targets['BP-RP'], targets['absG'], "*", color='black', mec="white", mew="0.25") # All targets
+ax.set_facecolor('#dbdbd9')
+
+# Nice orange: #F08B00
 
 # ax.plot(pm['BP-RP'][bad_pm], pm['absG'][bad_pm], 'o', color='red') # Uncomment this and comment line 65 to see removed data
 
-ax.plot(bhac_gaia['BP-RP'], bhac_gaia['G'], '-', color='#F0A3D3') # BHAC models for main sequence line
+# ax.plot(bhac_gaia['BP-RP'], bhac_gaia['G'], '-', color='#F0A3D3') # BHAC models for main sequence line
 # ax.plot(bhac_gaia['BP-RP'][bad_gaia], bhac_gaia['G'][bad_gaia], 'o', color='red') # Uncomment this and comment line 69 to see removed data
 
 
 
-# ax.plot(pm_binned_color2['BP-RP'], pm_binned_color2['absG'], 'o', color='orange')
+# ax.plot(pm_binned_color2['BP-RP'], pm_binned_color2['absG'], 'o', color='blue')
 # ax.plot(pm['BP-RP'][color_bin2], pm['absG'][color_bin2], '.', color='green')
 
 

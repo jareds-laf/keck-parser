@@ -440,11 +440,12 @@ if __name__ == "__main__":
         # If it is in wiyn multiple times, put it in targets_rv
         if count > 1:
             targets_rv = np.append(targets_rv, name[0])
-            
+                        
     # print(targets_rv)
 #%% Use the list of targets we have RVs for to generate files that we can feed MOLUSC
-for name in targets_rv:
+for i, name in enumerate(targets_rv):
     output_rv_data(name)
+    print(i)
     
 #%% TODO: Take targets_abr and add rv, rverr, hjd (converted to mjd) and output them to txt file readable by MOLUSC
 
