@@ -15,47 +15,49 @@ import pandas as pd
 from scipy.interpolate import interp1d
 import tkinter
 from tkinter import filedialog
+import time
+import datetime
 
 #%% Former keck_parser.py actions
 #%%% Plot all targets
 # Set plot style
-style_path = os.getenv("MPLCONFIGDIR", os.path.expanduser(r"C:\Users\Jared\anaconda3\Lib\site-packages\matplotlib\mpl-data\stylelib")).replace("\\", "/")
-mpl.style.use(os.path.join(style_path, 'bmh.mplstyle').replace("\\", "/"))
+# style_path = os.getenv("MPLCONFIGDIR", os.path.expanduser(r"C:\Users\Jared\anaconda3\Lib\site-packages\matplotlib\mpl-data\stylelib")).replace("\\", "/")
+# mpl.style.use(os.path.join(style_path, 'bmh.mplstyle').replace("\\", "/"))
 
 
-targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
-try:
-    fig, ax = plt.subplots()
-    for name, obsdate in targets.iterrows():
-        print("Name:", name, "Obsdate:", obsdate[14])
-        if not pd.isnull(obsdate[14]):
-            star = name.replace(" ", "_")
-            # print(star)
-            plot_star(star, ax)
-        else:
-            print(f"Plot not generated for {name} (no observation date)")
-except KeyboardInterrupt:
-    plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
-    ax.set_xlabel("Separation Values (mas)")
-    ax.set_ylabel("\u0394 Kp Magnitudes")
-    if ax.get_ylim()[0] < ax.get_ylim()[1]:
-        ax.invert_yaxis()
-    plt.grid(visible = True)
-    ax.set_xscale('log')
-    plt.show()
-    plt.close("all")
-else:
-    plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
-    ax.set_xlabel("Separation Values (mas)")
-    ax.set_ylabel("\u0394 Kp Magnitudes")
-    if ax.get_ylim()[0] < ax.get_ylim()[1]:
-        ax.invert_yaxis()
-    plt.grid(visible = True)
-    ax.set_xscale('log')
-    # plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.pdf'))
-    # plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.png'), dpi=300)
-    plt.show()
-    plt.close("all")
+# targets = pd.read_excel(r'G:/Shared drives/DouglasGroup/data/Copy of Keck Targets.xlsx', index_col=0)
+# try:
+#     fig, ax = plt.subplots()
+#     for name, obsdate in targets.iterrows():
+#         print("Name:", name, "Obsdate:", obsdate[14])
+#         if not pd.isnull(obsdate[14]):
+#             star = name.replace(" ", "_")
+#             # print(star)
+#             plot_star(star, ax)
+#         else:
+#             print(f"Plot not generated for {name} (no observation date)")
+# except KeyboardInterrupt:
+#     plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
+#     ax.set_xlabel("Separation Values (mas)")
+#     ax.set_ylabel("\u0394 Kp Magnitudes")
+#     if ax.get_ylim()[0] < ax.get_ylim()[1]:
+#         ax.invert_yaxis()
+#     plt.grid(visible = True)
+#     ax.set_xscale('log')
+#     plt.show()
+#     plt.close("all")
+# else:
+#     plt.title("\u0394 Kp Magnitude vs. Separation", fontsize = 12)
+#     ax.set_xlabel("Separation Values (mas)")
+#     ax.set_ylabel("\u0394 Kp Magnitudes")
+#     if ax.get_ylim()[0] < ax.get_ylim()[1]:
+#         ax.invert_yaxis()
+#     plt.grid(visible = True)
+#     ax.set_xscale('log')
+#     # plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.pdf'))
+#     # plt.savefig(os.path.expanduser(r'C:/Users/Jared/Documents/GitHub/data-parser/plots/keck_contrast_curves.png'), dpi=300)
+#     plt.show()
+#     plt.close("all")
 
 # print(get_data_masking("JS355"))
 
@@ -159,14 +161,14 @@ for j, star in enumerate(targets_abr["name"]):
 simmy = []
 a = np.arange(10)
 b = np.arange(5,17)
-print(a, b, len(a), len(b))
+# print(a, b, len(a), len(b))
 # print(a==b)
 # print(np.any(a==b))
-print(len(simbad["Name"]), len(targets_abr["name"]))
+# print(len(simbad["Name"]), len(targets_abr["name"]))
 # simmy = simbad["Name"]==targets_abr["name"]
 
 # simmy.append(np.any(np.where(simbad["Name"]==targets_abr["name"])))
-print(simmy, len(simmy))
+# print(simmy, len(simmy))
 # Add simbad indeces to targets_abr
 targets_abr.add_column(simbad_row_index_list, name="simbad_index")
 
@@ -404,7 +406,7 @@ lamost_search.add_column(names, name="name")
 sdss_search.add_columns([names, ra_j2k_list, de_j2k_list], names=["name", "ra", "dec"])
 # print(lamost_search.columns[:])
 # print(len(sdss_search))
-sdss_search.write(os.path.join(csv_path_github, "sdss_search.txt"), format = 'ascii.basic', delimiter = ' ', overwrite=True)
+# sdss_search.write(os.path.join(csv_path_github, "sdss_search.txt"), format = 'ascii.basic', delimiter = ' ', overwrite=True)
 
 # sdss_search.show_in_browser()
 # sdss_search.write(os.path.join(csv_path_github, "sdss_search.txt"), overwrite=True)
@@ -430,3 +432,15 @@ sdss_search.write(os.path.join(csv_path_github, "sdss_search.txt"), format = 'as
 #%% Tinkering with Tkinter to choose files with file explorer
 # tkinter.Tk().withdraw()
 # folder_path = filedialog.askdirectory()
+
+#%% Playing with datetime
+
+timea = datetime.datetime.now()
+
+time.sleep(1)
+
+timeb = datetime.datetime.now()
+    
+print(timea)
+print(timeb)
+print(timea-timeb)
