@@ -22,7 +22,7 @@ rv_output_path = os.path.expanduser(r"G:/Shared drives/DouglasGroup/Jared Sofair
 
 targets_abr = Table.read(os.path.join(csv_path_github, r'targets_abr.csv'))
 wiyn = Table.read(os.path.join(csv_path_drive, r'WIYN_RVs_matchedKeck.csv'))
-targets_wiyn = wiyn['Name']  
+targets_wiyn = wiyn['Name']
 
 # Get RV, RVerr, and HJD for each target that we have multiple RVs for
 def output_rv_data(starname):
@@ -430,18 +430,18 @@ if __name__ == "__main__":
 #%% Get a list of targets we have RVs for (they come up multiple times in WIYN_RVs_matchedKeck.csv)
     
     # List of all targets which appear multiple times in wiyn
-    # targets_rv = np.array([])
+    targets_rv = np.array([])
     
-    # for i, name in enumerate(targets_abr.iterrows('name')):
-    #     # Count the number of times a target appears in wiyn
-    #     count = np.count_nonzero(targets_wiyn == targets_abr['name'][i])
-    #     # print(f"{name[0]}: {count}")
+    for i, name in enumerate(targets_abr.iterrows('name')):
+        # Count the number of times a target appears in wiyn
+        count = np.count_nonzero(targets_wiyn == targets_abr['name'][i])
+        # print(f"{name[0]}: {count}")
         
-    #     # If it is in wiyn multiple times, put it in targets_rv
-    #     if count > 1:
-    #         targets_rv = np.append(targets_rv, name[0])
+        # If it is in wiyn multiple times, put it in targets_rv
+        if count > 1:
+            targets_rv = np.append(targets_rv, name[0])
                         
-    # print(targets_rv)
+    print(targets_rv)
 #%% Use the list of targets we have RVs for to generate files that we can feed MOLUSC
 # for i, name in enumerate(targets_rv):
 #     output_rv_data(name)

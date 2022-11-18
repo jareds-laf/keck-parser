@@ -113,6 +113,8 @@ csv_path_drive = os.path.expanduser(r"G:/Shared drives/DouglasGroup/Jared Sofair
 simbad = Table.read(os.path.expanduser(r"G:/Shared drives/DouglasGroup/data/keck_psf_detections_praesepe/Keck_Targets_2018B_Simbad.csv"))
 bhac_gaia = Table.read(os.path.join(csv_path_drive, r"BHAC Tables/BHAC_GAIA.csv"))
 bhac_2mass = Table.read(os.path.join(csv_path_drive, r"BHAC Tables/BHAC_2MASS.csv"))
+wiyn = Table.read(os.path.join(r'G:/Shared drives/DouglasGroup/data/wiyn/WIYN_RVs_matchedKeck.csv').replace("\\", "/"))
+targets_wiyn = wiyn['Name']
 
 pm = Table.read(os.path.join(csv_path_github, r'praesepe_merged.csv'))
 
@@ -135,6 +137,8 @@ de_j2k_list = []
 targets_abr = Table()
 lamost_search = Table()
 sdss_search = Table()
+has_rv_index = []
+
 
 
 #%%% Match name formatting of pm
@@ -150,6 +154,7 @@ names.sort()
 # testing = np.where(names.find("_") != 1, names = item.replace("_", " "))
 # print(testing.sort())
 targets_abr.add_column(names, name="name")
+# print(targets_abr)
 
 #%%% Get simbad indeces
 for j, star in enumerate(targets_abr["name"]):
@@ -364,46 +369,84 @@ targets_abr.add_columns([ra_list, de_list], names=["ra", "de"])
 #         print(f"BAD DEC {j}")
         
 # targets_abr.write(os.path.join(csv_path_github, "targets_abr.csv"), overwrite=True)
+#%% Get list of stars which we have RVs for
+# List of all targets which appear multiple times in wiyn
+# print(targets_abr)
+
+targets_rv = []
+
+for i, name in enumerate(targets_abr.iterrows('name')):
+    # Count the number of times a target appears in wiyn
+    count = np.count_nonzero(targets_wiyn == targets_abr['name'][i])
+    # print(f"{name[0]}: {count}")
+    
+    # If it is in wiyn multiple times, put it in targets_rv
+    if count > 1:
+        targets_rv = np.append(targets_rv, name[0])
+
+# Make an array of the indeces for targets that we have RVs for
+for i, name in enumerate(targets_rv):
+    has_rv_index.append(np.where(targets_abr['name']==targets_rv[i])[0][0])
+
+has_rv = np.zeros(len(targets_abr), dtype=bool)
+
+# Make a boolean array of targets with and without RVs
+for i, index in enumerate(has_rv_index):
+    has_rv[index] = True
+
+targets_abr.add_column(has_rv, name="has_rv")
+
+targets_abr.show_in_browser(jsviewer=True)
+    
+
+# print(has_rv_index)
+# print(targets_abr['name'] == targets_rv)
+# has_rv = targets_abr['name'][has_rv_index]
+
+# # print(has_rv)
+
+# # targets_abr.add_column(targets_rv, name="have_rv")
+# print(targets_rv, len(targets_rv))
 
 #%% Get RA_J2000 and DECJ_2000 for LAMOST searches
 
-ra_j2k_list = pm["RA_J2000"][targets_abr["pm_index"]]
-de_j2k_list = pm["DEC_J2000"][targets_abr["pm_index"]]
+# ra_j2k_list = pm["RA_J2000"][targets_abr["pm_index"]]
+# de_j2k_list = pm["DEC_J2000"][targets_abr["pm_index"]]
 
 
-lamost_search.add_columns([ra_j2k_list, de_j2k_list], names=["RA_J2000", "DEC_J2000"])
-# print(lamost_search.columns[:])
+# lamost_search.add_columns([ra_j2k_list, de_j2k_list], names=["RA_J2000", "DEC_J2000"])
+# # print(lamost_search.columns[:])
 
-sep_rad = np.full(len(lamost_search), 2.0)
-lamost_search.add_column(sep_rad, name="sep")
+# sep_rad = np.full(len(lamost_search), 2.0)
+# lamost_search.add_column(sep_rad, name="sep")
 
-# lamost_search.show_in_browser()
-lamost_search.write(os.path.join(csv_path_github, "lamost_search.csv"), overwrite=True)
+# # lamost_search.show_in_browser()
+# lamost_search.write(os.path.join(csv_path_github, "lamost_search.csv"), overwrite=True)
 
 
-# Check if ra_j2k and dec_j2k were properly assigned to each target
-for j, i in enumerate(targets_abr["pm_index"]):
-    # print(i, j)
-    star_ra = lamost_search["RA_J2000"][j]
-    pm_ra = pm["RA_J2000"][i]
+# # Check if ra_j2k and dec_j2k were properly assigned to each target
+# for j, i in enumerate(targets_abr["pm_index"]):
+#     # print(i, j)
+#     star_ra = lamost_search["RA_J2000"][j]
+#     pm_ra = pm["RA_J2000"][i]
     
-    star_de = lamost_search["DEC_J2000"][j]
-    pm_de = pm["DEC_J2000"][i]
+#     star_de = lamost_search["DEC_J2000"][j]
+#     pm_de = pm["DEC_J2000"][i]
     
-    if star_ra != pm_ra:
-        print(f"ERROR, ra_j2ks do not match: {star_ra}, {pm_ra}")
+#     if star_ra != pm_ra:
+#         print(f"ERROR, ra_j2ks do not match: {star_ra}, {pm_ra}")
     
-    if star_de != pm_de:
-        print(f"ERROR, de_j2ks do not match: {star_de}, {pm_de}")
+#     if star_de != pm_de:
+#         print(f"ERROR, de_j2ks do not match: {star_de}, {pm_de}")
 
-lamost_search.add_column(names, name="name")
+# lamost_search.add_column(names, name="name")
 # lamost_search.write(os.path.join(csv_path_github, "lamost_search_names.csv"), overwrite=True)
 
 #%% Get RA and DEC for SDSS CrossMatch search
 # ra_j2k_list = pm["RA_J2000"][targets_abr["pm_index"]]
 # de_j2k_list = pm["DEC_J2000"][targets_abr["pm_index"]]
 
-sdss_search.add_columns([names, ra_j2k_list, de_j2k_list], names=["name", "ra", "dec"])
+# sdss_search.add_columns([names, ra_j2k_list, de_j2k_list], names=["name", "ra", "dec"])
 # print(lamost_search.columns[:])
 # print(len(sdss_search))
 # sdss_search.write(os.path.join(csv_path_github, "sdss_search.txt"), format = 'ascii.basic', delimiter = ' ', overwrite=True)
@@ -435,12 +478,12 @@ sdss_search.add_columns([names, ra_j2k_list, de_j2k_list], names=["name", "ra", 
 
 #%% Playing with datetime
 
-timea = datetime.datetime.now()
+# timea = datetime.datetime.now()
 
-time.sleep(1)
+# time.sleep(1)
 
-timeb = datetime.datetime.now()
+# timeb = datetime.datetime.now()
     
-print(timea)
-print(timeb)
-print(timea-timeb)
+# print(timea)
+# print(timeb)
+# print(timea-timeb)
