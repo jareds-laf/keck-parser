@@ -95,8 +95,8 @@ pm_binned_color1 = pm_grouped_color1.groups.aggregate(np.mean)
 #%% Plotting G vs. BP-RP
 
 fig, ax = plt.subplots()
-ax.plot(pm['BP-RP'], pm['absG'], '.', color='#a10f05') # (Almost) all pm stars
-ax.plot(targets['BP-RP'], targets['absG'], "*", color='black', mec="white", mew="0.25") # All targets
+ax.plot(pm['BP-RP'], pm['absG'], '.', color='black') # (Almost) all pm stars
+ax.plot(targets['BP-RP'], targets['absG'], "*", color='#a10f05', mec="white", mew="0.25", markersize='10') # All targets
 ax.set_facecolor('#dbdbd9')
 
 # Nice orange: #F08B00

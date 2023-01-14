@@ -18,7 +18,8 @@ import mmap
 
 csv_path_github = os.path.expanduser(r"C:/Users/Jared/Documents/GitHub/data-parser/CSV Files")
 csv_path_drive = os.path.expanduser(r"G:/Shared drives/DouglasGroup/data/WIYN")
-rv_output_path = os.path.expanduser(r"G:/Shared drives/DouglasGroup/Jared Sofair 2022/MOLUSC/Data Parser tables/MOLUSC RVs")
+rv_output_path_drive = os.path.expanduser(r"G:/Shared drives/DouglasGroup/Jared Sofair 2022/MOLUSC/Data Parser tables/MOLUSC RVs")
+rv_output_path = os.path.expanduser(r"C:/Users/Jared/Documents/GitHub/MOLUSC/rvs")
 
 targets_abr = Table.read(os.path.join(csv_path_github, r'targets_abr.csv'))
 wiyn = Table.read(os.path.join(csv_path_drive, r'WIYN_RVs_matchedKeck.csv'))
@@ -440,12 +441,12 @@ if __name__ == "__main__":
         # If it is in wiyn multiple times, put it in targets_rv
         if count > 1:
             targets_rv = np.append(targets_rv, name[0])
-                        
+
     print(targets_rv)
 #%% Use the list of targets we have RVs for to generate files that we can feed MOLUSC
-# for i, name in enumerate(targets_rv):
-#     output_rv_data(name)
-#     print(i)
+for i, name in enumerate(targets_rv):
+    output_rv_data(name)
+    # print(i)
     
 #%% TODO: Take targets_abr and add rv, rverr, hjd (converted to mjd) and output them to txt file readable by MOLUSC
 
